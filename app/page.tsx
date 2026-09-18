@@ -1,69 +1,235 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { TripSearchForm } from "@/features/search/TripSearchForm";
+import { useTripSearch } from "@/features/search/use-trip-search";
+import { useParseTrip } from "@/features/search/use-parse-trip";
+import { defaultTripSearchValues, toTripSearchRequest, type TripSearchFormValues } from "@/features/search/schema";
+import { SearchProgress, SEARCH_PROGRESS_MIN_DURATION_MS } from "@/components/travel/SearchProgress";
+import { PackageResults } from "@/features/packages/PackageResults";
+import { PackageDetails } from "@/features/packages/PackageDetails";
+import { useLocale } from "@/lib/i18n/locale-context";
+import type { CabinClass, TravelPackage, TripSearchRequest, TripSearchResult } from "@/domain/travel/types";
+
+type View = "landing" | "searching";
 
 export default function Home() {
+  const [view, setView] = useState<View>("landing");
+  const [travelerCount, setTravelerCount] = useState(2);
+  const [selectedPackage, setSelectedPackage] = useState<TravelPackage | null>(null);
+  const [result, setResult] = useState<TripSearchResult | null>(null);
+  const [lastRequest, setLastRequest] = useState<TripSearchRequest | null>(null);
+  const [minDurationElapsed, setMinDurationElapsed] = useState(false);
+  const [nlError, setNlError] = useState<string | null>(null);
+  const [nlDraftText, setNlDraftText] = useState("");
+  const [nlPrefill, setNlPrefill] = useState<{
+    values: Partial<TripSearchFormValues>;
+    destinationLabel?: string;
+  } | null>(null);
+  const search = useTripSearch();
+  const parseTrip = useParseTrip();
+  const { t } = useLocale();
+  const showResults = view === "searching" && result !== null && minDurationElapsed;
+
+  function handleSubmit(request: TripSearchRequest) {
+    setTravelerCount(request.travelers.adults + request.travelers.children);
+    setResult(null);
+    setLastRequest(request);
+    setView("searching");
+    setMinDurationElapsed(false);
+    search.mutate(request, {
+      onSuccess: (data) => setResult(data),
+    });
+  }
+
+  function handleNaturalLanguageSubmit(text: string) {
+    setNlError(null);
+    setNlPrefill(null);
+    setNlDraftText(text);
+    // Jump to the loading screen immediately — waiting on a filled-in form
+    // and a second manual submit is a needless extra step for the user.
+    setResult(null);
+    setView("searching");
+    setMinDurationElapsed(false);
+    parseTrip.mutate(text, {
+      onSuccess: (intent) => {
+        const missingDestination = !intent.destination;
+        const missingDates = !intent.departureDate || !intent.returnDate;
+
+        if (missingDestination || missingDates) {
+          setNlError(
+            missingDestination && missingDates
+              ? t.search.nlMissingBoth
+              : missingDestination
+                ? t.search.nlMissingDestination
+                : t.search.nlMissingDates
+          );
+          setNlPrefill({
+            values: {
+              ...(intent.destination && { destination: intent.destination }),
+              ...(intent.departureDate && { departureDate: intent.departureDate }),
+              ...(intent.returnDate && { returnDate: intent.returnDate }),
+              ...(intent.adults && { adults: intent.adults }),
+              ...(intent.children !== null && { children: intent.children }),
+            },
+            destinationLabel: intent.destinationLabel ?? undefined,
+          });
+          setView("landing");
+          return;
+        }
+
+        const values: TripSearchFormValues = {
+          ...defaultTripSearchValues,
+          destination: intent.destination!,
+          departureDate: intent.departureDate!,
+          returnDate: intent.returnDate!,
+          adults: intent.adults ?? defaultTripSearchValues.adults,
+          children: intent.children ?? defaultTripSearchValues.children,
+        };
+        handleSubmit(toTripSearchRequest(values));
+      },
+      onError: (error) => {
+        setNlError(error.message);
+        setView("landing");
+      },
+    });
+  }
+
+  function handleNewSearch() {
+    setView("landing");
+    setResult(null);
+    setSelectedPackage(null);
+  }
+
+  function handleCabinClassChange(cabinClass: CabinClass) {
+    if (!lastRequest) return;
+    const request: TripSearchRequest = { ...lastRequest, preferences: { ...lastRequest.preferences, cabinClass } };
+    setLastRequest(request);
+    search.mutate(request, {
+      onSuccess: (data) => setResult(data),
+    });
+  }
+
+  useEffect(() => {
+    if (view !== "searching") return;
+    const timer = setTimeout(() => setMinDurationElapsed(true), SEARCH_PROGRESS_MIN_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, [view]);
+
+  function handlePackageUpdated(updated: TravelPackage) {
+    setSelectedPackage(updated);
+    setResult((prev) =>
+      prev
+        ? { ...prev, packages: prev.packages.map((p) => (p.id === updated.id ? updated : p)) }
+        : prev
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="flex flex-1 flex-col bg-background">
+      {showResults && <SiteHeader variant="solid" onHome={handleNewSearch} />}
+
+      <AnimatePresence mode="wait">
+        {view === "landing" && (
+          <motion.div key="landing" exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="h-dvh">
+            <Hero>
+              <TripSearchForm
+                onSubmit={handleSubmit}
+                isSubmitting={search.isPending}
+                onNaturalLanguageSubmit={handleNaturalLanguageSubmit}
+                isParsingNaturalLanguage={parseTrip.isPending}
+                naturalLanguageError={nlError}
+                initialNaturalLanguageText={nlDraftText}
+                initialValues={nlPrefill?.values}
+                initialDestinationLabel={nlPrefill?.destinationLabel}
+              />
+            </Hero>
+          </motion.div>
+        )}
+
+        {view === "searching" && !showResults && (
+          <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-dvh">
+            <SearchProgress onHome={handleNewSearch} />
+          </motion.div>
+        )}
+
+        {showResults && result && (
+          <motion.div
+            key="results"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+            <PackageResults
+              packages={result.packages}
+              travelerCount={travelerCount}
+              warnings={result.warnings}
+              onSelect={setSelectedPackage}
+              onNewSearch={handleNewSearch}
+              cabinClass={lastRequest?.preferences.cabinClass ?? "economy"}
+              onCabinClassChange={handleCabinClassChange}
+              isRefetching={search.isPending}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <PackageDetails
+        pkg={selectedPackage}
+        allPackages={result?.packages ?? []}
+        travelerCount={travelerCount}
+        onOpenChange={(open) => !open && setSelectedPackage(null)}
+        onUpdated={handlePackageUpdated}
+      />
+    </main>
+  );
+}
+
+function Hero({ children }: { children: React.ReactNode }) {
+  const { t } = useLocale();
+  return (
+    <section className="relative flex h-full flex-col overflow-hidden bg-navy-deep">
+      <Image
+        src="/bg-image.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
+        style={{ objectPosition: "50% 20%" }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/75 via-navy-deep/45 to-navy-deep/90" />
+
+      <SiteHeader variant="transparent" />
+
+      <div className="relative mx-auto flex h-full w-full max-w-4xl flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-4 pb-6 pt-20 text-center sm:gap-6 sm:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="flex shrink-0 flex-col items-center gap-2 sm:gap-3"
+        >
+          <h1 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-[40px]">
+            {t.hero.titleLine1}
+            <br />
+            {t.hero.titleLine2}
+          </h1>
+          <p className="hidden max-w-lg text-balance text-sm text-white/80 sm:block">{t.hero.subtitle}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-3xl shrink-0"
+        >
+          {children}
+        </motion.div>
+      </div>
+    </section>
   );
 }
