@@ -72,7 +72,7 @@ export const az = {
   },
   toolbar: {
     newSearch: "Yeni axtarış",
-    heading: (count: number) => `Bağlamağa dəyər ${count} səfər`,
+    heading: (count: number) => `Baxmağa dəyər ${count} səfər`,
     subtitle: "Bunlar tərcihlərinizə ən uyğun səfərlərdir.",
     searchHotelSr: "Otel adına görə axtar",
     searchHotelPlaceholder: "Otel adı axtar",
