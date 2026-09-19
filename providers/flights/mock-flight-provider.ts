@@ -10,7 +10,7 @@ function buildSegment(
   destination: FlightSegment["destination"],
   departure: Date,
   durationMinutes: number,
-  cabin: FlightSegment["cabin"]
+  cabin: FlightSegment["cabin"],
 ): FlightSegment {
   const arrival = new Date(departure.getTime() + durationMinutes * 60_000);
   return {
@@ -32,7 +32,9 @@ export class MockFlightProvider implements FlightProvider {
     const profile = resolveDestination(request.destination);
     if (!profile) return [];
 
-    const rng = mulberry32(hashSeed(`flight:${request.destination}:${request.departureDate}:${request.cabin}`));
+    const rng = mulberry32(
+      hashSeed(`flight:${request.destination}:${request.departureDate}:${request.cabin}`),
+    );
     const payingTravelers = request.travelers.adults + request.travelers.children;
     const offers: FlightOffer[] = [];
 
@@ -51,8 +53,12 @@ export class MockFlightProvider implements FlightProvider {
           : request.cabin
         : request.cabin;
 
-      const durationOut = profile.flightDurationMinutes + (variant.stops > 0 ? range(rng, 90, 240) : range(rng, -20, 20));
-      const durationIn = profile.flightDurationMinutes + (variant.stops > 0 ? range(rng, 90, 240) : range(rng, -20, 20));
+      const durationOut =
+        profile.flightDurationMinutes +
+        (variant.stops > 0 ? range(rng, 90, 240) : range(rng, -20, 20));
+      const durationIn =
+        profile.flightDurationMinutes +
+        (variant.stops > 0 ? range(rng, 90, 240) : range(rng, -20, 20));
 
       const departureHour = String(8 + Math.floor(rng() * 10)).padStart(2, "0");
       const returnHour = String(8 + Math.floor(rng() * 10)).padStart(2, "0");
@@ -67,7 +73,7 @@ export class MockFlightProvider implements FlightProvider {
           profile.airport,
           departure,
           Math.round(durationOut),
-          cabin
+          cabin,
         ),
       ];
       const inbound: FlightSegment[] = [
@@ -78,7 +84,7 @@ export class MockFlightProvider implements FlightProvider {
           ORIGIN,
           returning,
           Math.round(durationIn),
-          cabin
+          cabin,
         ),
       ];
 

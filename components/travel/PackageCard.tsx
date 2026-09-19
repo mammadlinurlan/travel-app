@@ -1,13 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
 import { Airplane, ArrowRight, Car, Check, Star } from "@phosphor-icons/react/dist/ssr";
+import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import type { TravelPackage } from "@/domain/travel/types";
-import { RecommendationBadge } from "./RecommendationBadge";
-import { formatAmount, formatDateShort, formatDuration, formatTime } from "@/lib/utils/format";
+import { type Dictionary, useLocale } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
-import { useLocale, type Dictionary } from "@/lib/i18n/locale-context";
+import { formatAmount, formatDateShort, formatDuration, formatTime } from "@/lib/utils/format";
+import { RecommendationBadge } from "./RecommendationBadge";
 
 interface PackageCardProps {
   pkg: TravelPackage;
@@ -50,7 +50,7 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
       transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3), ease: [0.16, 1, 0.3, 1] }}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-[18px] border bg-white shadow-card transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-card-hover",
-        pkg.score.category === "best_value" ? "border-gold/60 anim-glow-gold" : "border-border"
+        pkg.score.category === "best_value" ? "border-gold/60 anim-glow-gold" : "border-border",
       )}
     >
       {pkg.score.category === "best_value" && (
@@ -71,7 +71,9 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs text-ink-muted">{t.packageCard.noPhoto}</div>
+          <div className="flex h-full items-center justify-center text-xs text-ink-muted">
+            {t.packageCard.noPhoto}
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/35 via-transparent to-transparent" />
         <div className="absolute left-3 top-3">
@@ -81,7 +83,10 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
 
       <div className="flex flex-1 flex-col gap-3.5 p-5">
         <header className="flex flex-col gap-1.5">
-          <h3 id={headingId} className="text-[17px] font-semibold leading-snug tracking-tight text-ink">
+          <h3
+            id={headingId}
+            className="text-[17px] font-semibold leading-snug tracking-tight text-ink"
+          >
             <button
               type="button"
               onClick={() => onView(pkg)}
@@ -105,7 +110,9 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
             {pkg.hotel.rating > 0 && (
               <span className="font-medium text-ink">{pkg.hotel.rating.toFixed(1)}</span>
             )}
-            {pkg.hotel.reviewCount > 0 && <span>{t.packageCard.reviews(pkg.hotel.reviewCount)}</span>}
+            {pkg.hotel.reviewCount > 0 && (
+              <span>{t.packageCard.reviews(pkg.hotel.reviewCount)}</span>
+            )}
           </div>
         </header>
 
@@ -119,15 +126,19 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
                 <span className="truncate">{firstLeg.airline}</span>
               </div>
               <p className="mt-0.5 text-[15px] font-semibold tracking-tight text-ink">
-                {firstLeg.origin.code} <span className="text-ink-muted">→</span> {lastLeg.destination.code}
+                {firstLeg.origin.code} <span className="text-ink-muted">→</span>{" "}
+                {lastLeg.destination.code}
               </p>
               <p className="mt-0.5 text-[13px] text-ink">
-                {formatDateShort(firstLeg.departureTime, locale)}, {formatTime(firstLeg.departureTime, locale)} —{" "}
+                {formatDateShort(firstLeg.departureTime, locale)},{" "}
+                {formatTime(firstLeg.departureTime, locale)} —{" "}
                 {formatTime(lastLeg.arrivalTime, locale)}
               </p>
               <p className="mt-0.5 text-xs text-ink-muted">
-                {pkg.flight.stops === 0 ? t.packageCard.direct : t.packageCard.stops(pkg.flight.stops)} ·{" "}
-                {formatDuration(outboundMinutes)}
+                {pkg.flight.stops === 0
+                  ? t.packageCard.direct
+                  : t.packageCard.stops(pkg.flight.stops)}{" "}
+                · {formatDuration(outboundMinutes)}
               </p>
             </div>
           </div>
@@ -141,9 +152,13 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
                 <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-ink-muted">
                   {t.packageDetails.transfer}
                 </p>
-                <p className="mt-0.5 truncate text-[13px] font-medium text-ink">{pkg.transfer.vehicle}</p>
+                <p className="mt-0.5 truncate text-[13px] font-medium text-ink">
+                  {pkg.transfer.vehicle}
+                </p>
                 <p className="mt-0.5 text-xs text-ink-muted">
-                  {pkg.transfer.type === "private" ? t.packageDetails.private : t.packageDetails.shared}
+                  {pkg.transfer.type === "private"
+                    ? t.packageDetails.private
+                    : t.packageDetails.shared}
                 </p>
               </div>
             </div>
@@ -159,7 +174,9 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
               </li>
             ))}
             {extraInclusions > 0 && (
-              <li className="text-xs font-medium text-ink-muted">{t.packageCard.moreInclusions(extraInclusions)}</li>
+              <li className="text-xs font-medium text-ink-muted">
+                {t.packageCard.moreInclusions(extraInclusions)}
+              </li>
             )}
           </ul>
         )}
@@ -185,7 +202,7 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2",
                 pkg.score.category === "best_value"
                   ? "bg-gold text-navy-deep hover:bg-gold/90"
-                  : "bg-navy text-white hover:bg-navy-deep"
+                  : "bg-navy text-white hover:bg-navy-deep",
               )}
             >
               {t.packageCard.viewTrip}

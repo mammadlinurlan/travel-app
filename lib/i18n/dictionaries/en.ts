@@ -7,10 +7,7 @@ export const en: typeof az = {
   },
   nav: {
     explore: "Explore",
-    myTrips: "My Trips",
     help: "Help",
-    account: "Account",
-    accountAria: "Account",
   },
   hero: {
     eyebrow: "AI Trip Search",
@@ -50,14 +47,16 @@ export const en: typeof az = {
     nlFillPending: "Reading…",
     nlFillCta: "Search",
     nlFillSuccess: "Filled the form below — check it over.",
-    nlMissingDestination: "We couldn't tell where you want to go — please pick a destination below.",
+    nlMissingDestination:
+      "We couldn't tell where you want to go — please pick a destination below.",
     nlMissingDates: "We couldn't tell your travel dates — please pick them below.",
     nlMissingBoth: "We couldn't quite understand that — please fill in the fields below.",
     nlVoiceStartAria: "Start voice search",
     nlVoiceStopAria: "Stop voice search",
     nlVoiceRecording: "Listening… click again to finish",
     nlVoiceProcessing: "Analyzing what you said…",
-    nlVoicePermissionDenied: "Microphone access was denied — please allow it in your browser settings.",
+    nlVoicePermissionDenied:
+      "Microphone access was denied — please allow it in your browser settings.",
     nlVoiceUnsupportedTitle: "Voice search isn't supported in this browser",
     nlVoiceError: "We couldn't understand the audio — please try again or type instead.",
     trustNote: "Live search across real flights & hotels",
@@ -77,7 +76,11 @@ export const en: typeof az = {
       "Looking for airport transfers",
       "Building your perfect trip",
     ],
-    sideLabels: ["Good\ntrips\nahead", "A more\nmeaningful\nway to travel", "Some places\nstay with you\nforever"],
+    sideLabels: [
+      "Good\ntrips\nahead",
+      "A more\nmeaningful\nway to travel",
+      "Some places\nstay with you\nforever",
+    ],
   },
   toolbar: {
     newSearch: "New search",
@@ -118,10 +121,12 @@ export const en: typeof az = {
   warnings: {
     flights_unavailable: "Flights are temporarily unavailable. Try again shortly.",
     hotels_unavailable: "Hotels are temporarily unavailable. Try again shortly.",
-    transfer_unavailable: "We couldn't find live transfer options. You can continue without a transfer.",
+    transfer_unavailable:
+      "We couldn't find live transfer options. You can continue without a transfer.",
     no_flights_route: "We couldn't find live flight options for this route.",
     no_hotels_dates: "We couldn't find hotel availability for these dates.",
-    hotel_star_mismatch: "No hotels matched your star preference exactly — showing the closest options.",
+    hotel_star_mismatch:
+      "No hotels matched your star preference exactly — showing the closest options.",
     no_complete_trip: "We couldn't build a complete trip from the available inventory.",
   },
   filters: {
@@ -251,7 +256,8 @@ export const en: typeof az = {
     sendPending: "Sending…",
     sendCta: "Request this offer",
     successTitle: "Request sent",
-    successBody: "We've noted your trip — a travel specialist will follow up with your offer shortly.",
+    successBody:
+      "We've noted your trip — a travel specialist will follow up with your offer shortly.",
     close: "Close",
   },
   mealPlanLabels: {

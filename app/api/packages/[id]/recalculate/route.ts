@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { customizationSchema } from "@/domain/travel/validation";
 import { RecalculationError, recalculatePackage } from "@/lib/server/recalculate-service";
 
@@ -14,7 +14,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const parsed = customizationSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid customization request.", issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid customization request.", issues: parsed.error.issues },
+      { status: 400 },
+    );
   }
 
   try {

@@ -2,8 +2,8 @@
 
 import { Airplane, Bed, Car, DoorOpen, HourglassMedium } from "@phosphor-icons/react/dist/ssr";
 import type { FlightSegment, TravelPackage } from "@/domain/travel/types";
+import { type Dictionary, type Locale, useLocale } from "@/lib/i18n/locale-context";
 import { formatDateShort, formatTime } from "@/lib/utils/format";
-import { useLocale, type Dictionary, type Locale } from "@/lib/i18n/locale-context";
 
 interface TimelineStep {
   icon: typeof Airplane;
@@ -18,7 +18,8 @@ function flightSteps(segments: FlightSegment[], t: Dictionary, locale: Locale): 
     if (index > 0) {
       const previous = segments[index - 1];
       const layoverMinutes = Math.round(
-        (new Date(segment.departureTime).getTime() - new Date(previous.arrivalTime).getTime()) / 60000
+        (new Date(segment.departureTime).getTime() - new Date(previous.arrivalTime).getTime()) /
+          60000,
       );
       steps.push({
         icon: HourglassMedium,
@@ -30,7 +31,8 @@ function flightSteps(segments: FlightSegment[], t: Dictionary, locale: Locale): 
       });
     }
     const departsOnDifferentDay =
-      formatDateShort(segment.arrivalTime, locale) !== formatDateShort(segment.departureTime, locale);
+      formatDateShort(segment.arrivalTime, locale) !==
+      formatDateShort(segment.departureTime, locale);
     const arrival = departsOnDifferentDay
       ? `${formatTime(segment.arrivalTime, locale)} (${formatDateShort(segment.arrivalTime, locale)})`
       : formatTime(segment.arrivalTime, locale);

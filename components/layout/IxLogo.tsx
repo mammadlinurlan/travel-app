@@ -28,7 +28,10 @@ export function IxLogo({ height = 32, className }: Readonly<IxLogoProps>) {
 const MARK_LEFT_FRACTION = 0.06;
 const MARK_WIDTH_FRACTION = 0.4;
 
-export function IxMark({ height = 32, className }: Readonly<{ height?: number; className?: string }>) {
+export function IxMark({
+  height = 32,
+  className,
+}: Readonly<{ height?: number; className?: string }>) {
   const fullWidth = height * LOGO_ASPECT;
   const containerWidth = Math.round(fullWidth * MARK_WIDTH_FRACTION);
   return (

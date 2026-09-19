@@ -55,7 +55,12 @@ export async function runTripSearch(request: TripSearchRequest): Promise<TripSea
 
   const result: TripSearchResult = {
     searchId,
-    status: engineResult.packages.length > 0 ? (allWarnings.length > 0 ? "partial" : "completed") : "failed",
+    status:
+      engineResult.packages.length > 0
+        ? allWarnings.length > 0
+          ? "partial"
+          : "completed"
+        : "failed",
     request,
     packages: engineResult.packages,
     warnings: allWarnings,

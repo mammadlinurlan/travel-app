@@ -96,11 +96,17 @@ export class LiteApiHotelProvider implements HotelProvider {
   }
 }
 
-function mapHotel(entry: LiteApiHotelRates, hotel: LiteApiHotel | undefined, occupants: number): HotelOffer | null {
+function mapHotel(
+  entry: LiteApiHotelRates,
+  hotel: LiteApiHotel | undefined,
+  occupants: number,
+): HotelOffer | null {
   if (!hotel) return null;
 
   const rooms: Room[] = entry.roomTypes.flatMap((roomType, roomIndex) =>
-    roomType.rates.map((rate, rateIndex) => mapRate(rate, `${entry.hotelId}-${roomIndex}-${rateIndex}`, occupants))
+    roomType.rates.map((rate, rateIndex) =>
+      mapRate(rate, `${entry.hotelId}-${roomIndex}-${rateIndex}`, occupants),
+    ),
   );
   if (rooms.length === 0) return null;
 

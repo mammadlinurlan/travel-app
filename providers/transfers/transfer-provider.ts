@@ -1,4 +1,4 @@
-import type { Travelers, TransferOffer } from "@/domain/travel/types";
+import type { TransferOffer, Travelers } from "@/domain/travel/types";
 
 export interface TransferSearchRequest {
   destination: string;

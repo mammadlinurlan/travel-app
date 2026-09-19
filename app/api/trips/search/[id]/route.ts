@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { travelStore } from "@/lib/server/store";
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

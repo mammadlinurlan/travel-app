@@ -1,4 +1,10 @@
-import type { FlightOffer, HotelOffer, Room, TransferOffer, TravelPackage } from "@/domain/travel/types";
+import type {
+  FlightOffer,
+  HotelOffer,
+  Room,
+  TransferOffer,
+  TravelPackage,
+} from "@/domain/travel/types";
 
 export interface FlightInventoryItem {
   flight: FlightOffer;
@@ -32,7 +38,8 @@ export function deriveBuilderInventory(packages: TravelPackage[]): BuilderInvent
   for (const pkg of packages) {
     if (!flights.has(pkg.flight.id)) flights.set(pkg.flight.id, pkg.flight);
     if (!hotels.has(pkg.hotel.id)) hotels.set(pkg.hotel.id, pkg.hotel);
-    if (pkg.transfer && !transfers.has(pkg.transfer.id)) transfers.set(pkg.transfer.id, pkg.transfer);
+    if (pkg.transfer && !transfers.has(pkg.transfer.id))
+      transfers.set(pkg.transfer.id, pkg.transfer);
   }
 
   const hotelRooms: HotelInventoryItem[] = [];

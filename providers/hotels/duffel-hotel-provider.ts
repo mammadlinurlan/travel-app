@@ -80,31 +80,43 @@ export class DuffelHotelProvider implements HotelProvider {
 
     const results = (searchJson.data ?? [])
       .filter((r) => r.accommodation)
-      .sort((a, b) => Number(a.cheapest_rate_total_amount ?? Infinity) - Number(b.cheapest_rate_total_amount ?? Infinity))
+      .sort(
+        (a, b) =>
+          Number(a.cheapest_rate_total_amount ?? Infinity) -
+          Number(b.cheapest_rate_total_amount ?? Infinity),
+      )
       .slice(0, MAX_ACCOMMODATIONS_TO_EXPAND);
 
     const offers = await Promise.all(
-      results.map((result) => this.expandSearchResult(result, occupants).catch(() => null))
+      results.map((result) => this.expandSearchResult(result, occupants).catch(() => null)),
     );
 
     return offers.filter((offer): offer is HotelOffer => offer !== null);
   }
 
-  private async expandSearchResult(searchResult: Record<string, unknown>, occupants: number): Promise<HotelOffer | null> {
+  private async expandSearchResult(
+    searchResult: Record<string, unknown>,
+    occupants: number,
+  ): Promise<HotelOffer | null> {
     const accommodation = searchResult.accommodation as Record<string, unknown>;
     const searchResultId = String(searchResult.id);
 
     const ratesJson = await this.request<{ data: Record<string, unknown> }>(
       `/stays/search_results/${searchResultId}/actions/fetch_all_rates`,
-      {}
+      {},
     );
 
-    const accommodationWithRooms = (ratesJson.data?.accommodation ?? accommodation) as Record<string, unknown>;
+    const accommodationWithRooms = (ratesJson.data?.accommodation ?? accommodation) as Record<
+      string,
+      unknown
+    >;
     const rawRooms = (accommodationWithRooms.rooms as Array<Record<string, unknown>>) ?? [];
 
     const rooms: Room[] = rawRooms.flatMap((room, roomIndex) => {
       const rates = (room.rates as Array<Record<string, unknown>>) ?? [];
-      return rates.map((rate, rateIndex) => mapRate(rate, room, `${searchResultId}-${roomIndex}-${rateIndex}`, occupants));
+      return rates.map((rate, rateIndex) =>
+        mapRate(rate, room, `${searchResultId}-${roomIndex}-${rateIndex}`, occupants),
+      );
     });
 
     if (rooms.length === 0) return null;
@@ -135,16 +147,19 @@ function mapRate(
   rate: Record<string, unknown>,
   room: Record<string, unknown>,
   id: string,
-  occupants: number
+  occupants: number,
 ): Room {
-  const cancellationTimeline = (rate.cancellation_timeline as Array<Record<string, unknown>> | undefined) ?? [];
+  const cancellationTimeline =
+    (rate.cancellation_timeline as Array<Record<string, unknown>> | undefined) ?? [];
   return {
     id: `duffel-room-${id}`,
     name: String(room.name ?? "Room"),
     mealPlan: BOARD_TYPE_MAP[String(rate.board_type ?? "room_only")] ?? "room_only",
     maxOccupancy: Math.max(occupants, 1),
     refundable: cancellationTimeline.length > 0,
-    cancellationDeadline: cancellationTimeline[0]?.before ? String(cancellationTimeline[0].before) : undefined,
+    cancellationDeadline: cancellationTimeline[0]?.before
+      ? String(cancellationTimeline[0].before)
+      : undefined,
     price: {
       amount: Number(rate.total_amount ?? 0),
       currency: (rate.total_currency as Room["price"]["currency"]) ?? "USD",

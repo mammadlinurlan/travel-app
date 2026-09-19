@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { offerRequestSchema } from "@/domain/travel/validation";
 import { travelStore } from "@/lib/server/store";
 
@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
 
   const parsed = offerRequestSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid offer request.", issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid offer request.", issues: parsed.error.issues },
+      { status: 400 },
+    );
   }
 
   const pkg = travelStore.getPackage(parsed.data.packageId);

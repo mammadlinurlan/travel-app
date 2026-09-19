@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { Check, MapPin, Star } from "@phosphor-icons/react/dist/ssr";
+import Image from "next/image";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { formatAmount } from "@/lib/utils/format";
-import { cn } from "@/lib/utils";
-import { useLocale } from "@/lib/i18n/locale-context";
 import type { HotelOffer, Room } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
+import { formatAmount } from "@/lib/utils/format";
 
 interface HotelDetailsSheetProps {
   hotel: HotelOffer | null;
@@ -27,25 +27,39 @@ export function HotelDetailsSheet({ hotel, onOpenChange, onSelect }: HotelDetail
         {hotel && (
           <>
             <div className="relative h-44 w-full shrink-0 bg-sand">
-              {hotel.image && <Image src={hotel.image} alt={hotel.name} fill sizes="576px" className="object-cover" />}
+              {hotel.image && (
+                <Image
+                  src={hotel.image}
+                  alt={hotel.name}
+                  fill
+                  sizes="576px"
+                  className="object-cover"
+                />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/85 via-navy-deep/20 to-transparent" />
               <div className="absolute inset-x-5 bottom-4 flex flex-col gap-1">
                 <SheetHeader className="p-0">
-                  <SheetTitle className="text-left text-xl font-semibold text-white">{hotel.name}</SheetTitle>
+                  <SheetTitle className="text-left text-xl font-semibold text-white">
+                    {hotel.name}
+                  </SheetTitle>
                 </SheetHeader>
               </div>
             </div>
 
             <div className="flex flex-col gap-5 px-5 py-5">
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-0.5 text-gold-deep" aria-label={t.packageCard.starHotelAria(hotel.stars)}>
+                <span
+                  className="flex items-center gap-0.5 text-gold-deep"
+                  aria-label={t.packageCard.starHotelAria(hotel.stars)}
+                >
                   {Array.from({ length: hotel.stars }).map((_, i) => (
                     <Star key={i} className="size-3.5" weight="fill" aria-hidden />
                   ))}
                 </span>
                 {hotel.rating > 0 && (
                   <span className="text-sm text-ink-muted">
-                    <span className="font-semibold text-ink">{hotel.rating.toFixed(1)}</span> {t.packageCard.reviews(hotel.reviewCount)}
+                    <span className="font-semibold text-ink">{hotel.rating.toFixed(1)}</span>{" "}
+                    {t.packageCard.reviews(hotel.reviewCount)}
                   </span>
                 )}
               </div>
@@ -74,14 +88,16 @@ export function HotelDetailsSheet({ hotel, onOpenChange, onSelect }: HotelDetail
                   <div
                     key={room.id}
                     className={cn(
-                      "flex items-center justify-between gap-3 rounded-xl border border-border bg-white p-4"
+                      "flex items-center justify-between gap-3 rounded-xl border border-border bg-white p-4",
                     )}
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-ink">{room.name}</p>
                       <p className="text-xs text-ink-muted">
                         {t.mealPlanLabels[room.mealPlan]} ·{" "}
-                        {room.refundable ? t.packageDetails.freeCancellation : t.packageDetails.nonRefundable}
+                        {room.refundable
+                          ? t.packageDetails.freeCancellation
+                          : t.packageDetails.nonRefundable}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-ink">
                         {formatAmount(room.price.amount, room.price.currency)}

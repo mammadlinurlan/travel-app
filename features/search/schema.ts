@@ -24,10 +24,13 @@ export function createTripSearchFormSchema(messages: TripSearchFormMessages) {
       infants: z.number().int().min(0).max(4),
       transferRequired: z.boolean(),
     })
-    .refine((data) => !data.departureDate || !data.returnDate || data.returnDate > data.departureDate, {
-      message: messages.returnAfterDeparture,
-      path: ["returnDate"],
-    });
+    .refine(
+      (data) => !data.departureDate || !data.returnDate || data.returnDate > data.departureDate,
+      {
+        message: messages.returnAfterDeparture,
+        path: ["returnDate"],
+      },
+    );
 }
 
 export type TripSearchFormValues = z.infer<ReturnType<typeof createTripSearchFormSchema>>;

@@ -1,8 +1,8 @@
 "use client";
 
 import type { PackageCategory } from "@/domain/travel/types";
-import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
 
 const STYLE: Record<PackageCategory, { className: string; dot: string } | null> = {
   cheapest: { className: "bg-white/95 text-navy", dot: "bg-success" },
@@ -21,7 +21,7 @@ export function RecommendationBadge({ category }: { category: PackageCategory })
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] shadow-sm backdrop-blur-sm",
-        style.className
+        style.className,
       )}
     >
       <span className={cn("size-1.5 rounded-full", style.dot)} aria-hidden />

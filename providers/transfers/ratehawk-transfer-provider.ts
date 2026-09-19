@@ -12,7 +12,7 @@ export class RateHawkTransferProvider implements TransferProvider {
 
   async searchTransfers(): Promise<TransferOffer[]> {
     throw new Error(
-      "RateHawkTransferProvider is not implemented — verify transfer API availability against current RateHawk docs. Use TRAVEL_PROVIDER_MODE=mock."
+      "RateHawkTransferProvider is not implemented — verify transfer API availability against current RateHawk docs. Use TRAVEL_PROVIDER_MODE=mock.",
     );
   }
 }

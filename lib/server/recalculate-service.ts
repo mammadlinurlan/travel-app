@@ -7,13 +7,14 @@ export class RecalculationError extends Error {}
 
 export async function recalculatePackage(
   packageId: string,
-  customization: CustomizationRequest
+  customization: CustomizationRequest,
 ): Promise<TravelPackage> {
   const current = travelStore.getPackage(packageId);
   if (!current) throw new RecalculationError("Package not found.");
 
   const search = travelStore.getSearchForPackage(packageId);
-  if (!search) throw new RecalculationError("Original search context expired — please search again.");
+  if (!search)
+    throw new RecalculationError("Original search context expired — please search again.");
 
   const { request } = search;
   const travelerCount = request.travelers.adults + request.travelers.children;
@@ -34,14 +35,19 @@ export async function recalculatePackage(
       travelers: request.travelers,
       starRatings: request.preferences.hotelStars,
     }),
-    getTransferProvider().searchTransfers({ destination: request.destination, travelers: request.travelers }),
+    getTransferProvider().searchTransfers({
+      destination: request.destination,
+      travelers: request.travelers,
+    }),
   ]);
 
   const flight = customization.flightId
-    ? flights.find((f) => f.id === customization.flightId) ?? current.flight
+    ? (flights.find((f) => f.id === customization.flightId) ?? current.flight)
     : current.flight;
 
-  const hotel = customization.hotelId ? hotels.find((h) => h.id === customization.hotelId) : undefined;
+  const hotel = customization.hotelId
+    ? hotels.find((h) => h.id === customization.hotelId)
+    : undefined;
   const activeHotel = hotel ?? current.hotel;
 
   let room = current.room;

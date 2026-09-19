@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, MapPin, Sparkle, Wrench } from "@phosphor-icons/react/dist/ssr";
-import { IxLogo, IxMark } from "@/components/layout/IxLogo";
+import { IxLogo } from "@/components/layout/IxLogo";
 import { useLocale } from "@/lib/i18n/locale-context";
 
 interface ResultsTopBarProps {
@@ -18,7 +18,13 @@ interface ResultsTopBarProps {
  * through. Meant to be rendered inside a `-mx-*` bleed wrapper so it spans
  * edge to edge even though its parent is horizontally padded.
  */
-export function ResultsTopBar({ tripSummary, onBack, onOpenBuilder, onBuild, showBuildCta }: ResultsTopBarProps) {
+export function ResultsTopBar({
+  tripSummary,
+  onBack,
+  onOpenBuilder,
+  onBuild,
+  showBuildCta,
+}: ResultsTopBarProps) {
   const { t } = useLocale();
   return (
     <div className="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-2 overflow-hidden bg-navy px-3 sm:h-16 sm:gap-3 sm:px-6 lg:px-8">
@@ -31,7 +37,6 @@ export function ResultsTopBar({ tripSummary, onBack, onOpenBuilder, onBuild, sho
         <ArrowLeft className="size-4" weight="bold" aria-hidden />
       </button>
 
-      <IxMark height={26} className="shrink-0 sm:hidden" />
       <IxLogo height={36} className="hidden shrink-0 sm:flex" />
 
       <div className="flex min-w-0 flex-1 items-center gap-1.5 truncate rounded-full bg-ivory/10 px-2.5 py-1.5 text-[11px] font-medium text-ivory/80 sm:ml-3 sm:px-3 sm:text-xs">

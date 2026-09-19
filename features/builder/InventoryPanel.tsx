@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { Airplane, Bed, Car, DotsSixVertical, Star } from "@phosphor-icons/react/dist/ssr";
+import { useMemo, useState } from "react";
 import { cheapestRoomFor } from "@/domain/travel/pricing";
-import { formatAmount, formatDateShort, formatTime } from "@/lib/utils/format";
-import { cn } from "@/lib/utils";
-import { useLocale } from "@/lib/i18n/locale-context";
 import type { HotelOffer } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
+import { formatAmount, formatDateShort, formatTime } from "@/lib/utils/format";
 import type { BuilderInventory } from "./builder-inventory";
 import type { InventoryItemData } from "./types";
 
@@ -42,7 +42,9 @@ function Row({
 }) {
   const { t } = useLocale();
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id, data });
-  const style = transform ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` } : undefined;
+  const style = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    : undefined;
   const Icon = TYPE_STYLES[data.type].icon;
 
   return (
@@ -56,15 +58,22 @@ function Row({
       className={cn(
         "flex w-full cursor-grab select-none items-center gap-2.5 p-3 text-left text-sm transition-colors active:scale-[0.99] active:cursor-grabbing",
         active ? "bg-navy/5" : "hover:bg-sand/60",
-        isDragging && "opacity-50 shadow-lg"
+        isDragging && "opacity-50 shadow-lg",
       )}
     >
       <DotsSixVertical className="hidden size-3.5 shrink-0 text-border lg:block" aria-hidden />
-      <div className={cn("flex size-7 shrink-0 items-center justify-center rounded-lg", TYPE_STYLES[data.type].chip)}>
+      <div
+        className={cn(
+          "flex size-7 shrink-0 items-center justify-center rounded-lg",
+          TYPE_STYLES[data.type].chip,
+        )}
+      >
         <Icon className="size-3.5" weight="regular" aria-hidden />
       </div>
       <div className="min-w-0 flex-1">{children}</div>
-      <span className="shrink-0 text-[10px] font-semibold text-gold lg:hidden">{t.builder.tapToAdd}</span>
+      <span className="shrink-0 text-[10px] font-semibold text-gold lg:hidden">
+        {t.builder.tapToAdd}
+      </span>
     </button>
   );
 }
@@ -78,7 +87,9 @@ export function InventoryPanel({
   selectedTransferId,
 }: InventoryPanelProps) {
   const { t, locale } = useLocale();
-  const [categoryFilter, setCategoryFilter] = useState<"all" | "flight" | "hotel" | "transfer">("all");
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "flight" | "hotel" | "transfer">(
+    "all",
+  );
 
   const categories: { key: "all" | "flight" | "hotel" | "transfer"; label: string }[] = [
     { key: "all", label: t.builder.filterAll },
@@ -87,7 +98,8 @@ export function InventoryPanel({
     { key: "transfer", label: t.packageDetails.transfer },
   ];
 
-  const showFlights = categoryFilter === "all" || categoryFilter === "flight" ? inventory.flights : [];
+  const showFlights =
+    categoryFilter === "all" || categoryFilter === "flight" ? inventory.flights : [];
   const showHotelsCategory = categoryFilter === "all" || categoryFilter === "hotel";
 
   // One row per hotel (not per room) — its room/meal-plan choice happens in
@@ -103,7 +115,8 @@ export function InventoryPanel({
     }
     return result;
   }, [inventory.hotelRooms, showHotelsCategory]);
-  const showTransfers = categoryFilter === "all" || categoryFilter === "transfer" ? inventory.transfers : [];
+  const showTransfers =
+    categoryFilter === "all" || categoryFilter === "transfer" ? inventory.transfers : [];
 
   return (
     <div className="flex flex-col">
@@ -117,7 +130,9 @@ export function InventoryPanel({
               onClick={() => setCategoryFilter(key)}
               className={cn(
                 "rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-colors",
-                categoryFilter === key ? "bg-navy text-ivory" : "bg-sand text-ink-muted hover:text-ink"
+                categoryFilter === key
+                  ? "bg-navy text-ivory"
+                  : "bg-sand text-ink-muted hover:text-ink",
               )}
             >
               {label}
@@ -143,10 +158,13 @@ export function InventoryPanel({
                 {firstLeg.airline} · {firstLeg.origin.code}→{lastLeg.destination.code}
               </p>
               <p className="truncate text-[11px] text-ink-muted">
-                {formatDateShort(firstLeg.departureTime, locale)}, {formatTime(firstLeg.departureTime, locale)} —{" "}
+                {formatDateShort(firstLeg.departureTime, locale)},{" "}
+                {formatTime(firstLeg.departureTime, locale)} —{" "}
                 {formatTime(lastLeg.arrivalTime, locale)}
               </p>
-              <span className="mt-0.5 text-[11px] font-bold text-ink">{formatAmount(flight.price.amount, flight.price.currency)}</span>
+              <span className="mt-0.5 text-[11px] font-bold text-ink">
+                {formatAmount(flight.price.amount, flight.price.currency)}
+              </span>
             </Row>
           );
         })}
@@ -169,15 +187,19 @@ export function InventoryPanel({
                 ))}
               </span>
               <span className="mt-0.5 text-[11px] font-bold text-ink">
-                {t.sourceGrouped.fromPrice} {formatAmount(cheapestRoom.price.amount, cheapestRoom.price.currency)}
+                {t.sourceGrouped.fromPrice}{" "}
+                {formatAmount(cheapestRoom.price.amount, cheapestRoom.price.currency)}
               </span>
             </Row>
           );
         })}
 
-        {showTransfers.length === 0 && categoryFilter !== "flight" && categoryFilter !== "hotel" && inventory.transfers.length === 0 && (
-          <p className="p-3.5 text-xs text-ink-muted">{t.customize.noTransfer}</p>
-        )}
+        {showTransfers.length === 0 &&
+          categoryFilter !== "flight" &&
+          categoryFilter !== "hotel" &&
+          inventory.transfers.length === 0 && (
+            <p className="p-3.5 text-xs text-ink-muted">{t.customize.noTransfer}</p>
+          )}
         {showTransfers.map(({ transfer }) => {
           const data: InventoryItemData = { type: "transfer", transferId: transfer.id };
           return (
@@ -189,7 +211,9 @@ export function InventoryPanel({
               onClick={() => onSelect(data)}
             >
               <p className="truncate text-xs font-semibold text-ink">{transfer.vehicle}</p>
-              <span className="mt-0.5 text-[11px] font-bold text-ink">{formatAmount(transfer.price.amount, transfer.price.currency)}</span>
+              <span className="mt-0.5 text-[11px] font-bold text-ink">
+                {formatAmount(transfer.price.amount, transfer.price.currency)}
+              </span>
             </Row>
           );
         })}

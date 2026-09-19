@@ -1,13 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
-import Image from "next/image";
 import { Check } from "@phosphor-icons/react/dist/ssr";
-import type { FlightOffer, HotelOffer, Room, TransferOffer, TravelPackage } from "@/domain/travel/types";
+import Image from "next/image";
+import { useMemo } from "react";
+import type {
+  FlightOffer,
+  HotelOffer,
+  Room,
+  TransferOffer,
+  TravelPackage,
+} from "@/domain/travel/types";
+import { type Dictionary, useLocale } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
-import { formatMoney, formatDuration } from "@/lib/utils/format";
+import { formatDuration, formatMoney } from "@/lib/utils/format";
 import { useRecalculatePackage } from "./use-recalculate";
-import { useLocale, type Dictionary } from "@/lib/i18n/locale-context";
 
 interface PackageCustomizerProps {
   current: TravelPackage;
@@ -31,17 +37,34 @@ export function PackageCustomizer({ current, allPackages, onUpdated }: PackageCu
   const { t } = useLocale();
   const recalculate = useRecalculatePackage(current.id);
 
-  const flights = useMemo(() => uniqueBy(allPackages.map((p) => p.flight), (f) => f.id), [allPackages]);
+  const flights = useMemo(
+    () =>
+      uniqueBy(
+        allPackages.map((p) => p.flight),
+        (f) => f.id,
+      ),
+    [allPackages],
+  );
   const hotelRoomPairs = useMemo(
-    () => uniqueBy(allPackages.map((p) => ({ hotel: p.hotel, room: p.room })), (p) => `${p.hotel.id}:${p.room.id}`),
-    [allPackages]
+    () =>
+      uniqueBy(
+        allPackages.map((p) => ({ hotel: p.hotel, room: p.room })),
+        (p) => `${p.hotel.id}:${p.room.id}`,
+      ),
+    [allPackages],
   );
   const transfers = useMemo(
-    () => uniqueBy(allPackages.map((p) => p.transfer).filter((t): t is TransferOffer => t !== null), (t) => t.id),
-    [allPackages]
+    () =>
+      uniqueBy(
+        allPackages.map((p) => p.transfer).filter((t): t is TransferOffer => t !== null),
+        (t) => t.id,
+      ),
+    [allPackages],
   );
 
-  async function apply(customization: Parameters<ReturnType<typeof useRecalculatePackage>["mutateAsync"]>[0]) {
+  async function apply(
+    customization: Parameters<ReturnType<typeof useRecalculatePackage>["mutateAsync"]>[0],
+  ) {
     const updated = await recalculate.mutateAsync(customization);
     onUpdated(updated);
   }
@@ -129,7 +152,7 @@ function OptionShell({
       onClick={onSelect}
       className={cn(
         "flex items-center justify-between gap-3 rounded-lg border px-3 py-2.5 text-left text-sm transition-colors disabled:cursor-default",
-        selected ? "border-navy bg-navy/5" : "border-border bg-white hover:bg-sand/50"
+        selected ? "border-navy bg-navy/5" : "border-border bg-white hover:bg-sand/50",
       )}
     >
       {children}
@@ -155,7 +178,8 @@ function FlightOption({
     <OptionShell selected={selected} disabled={disabled} onSelect={onSelect}>
       <div>
         <p className="font-medium text-ink">
-          {flight.outbound[0].airline} · {flight.stops === 0 ? t.customize.direct : t.customize.stop(flight.stops)}
+          {flight.outbound[0].airline} ·{" "}
+          {flight.stops === 0 ? t.customize.direct : t.customize.stop(flight.stops)}
         </p>
         <p className="text-xs text-ink-muted">
           {formatDuration(flight.totalDurationMinutes)} {t.customize.total}
@@ -223,7 +247,9 @@ function TransferOption({
   return (
     <OptionShell selected={selected} disabled={disabled} onSelect={onSelect}>
       <p className="font-medium text-ink">{label}</p>
-      <span className="shrink-0 text-sm font-semibold text-navy">{price ? formatMoney(price) : "—"}</span>
+      <span className="shrink-0 text-sm font-semibold text-navy">
+        {price ? formatMoney(price) : "—"}
+      </span>
     </OptionShell>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowUp, Microphone, Sparkle, WarningCircle, X } from "@phosphor-icons/react/dist/ssr";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
 
@@ -124,7 +124,9 @@ export function NaturalLanguageInput({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "";
-      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+      const recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
       chunksRef.current = [];
 
       recorder.ondataavailable = (event) => {
@@ -191,11 +193,14 @@ export function NaturalLanguageInput({
               "relative flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors",
               isRecording
                 ? "border-error/40 bg-error/10 text-error"
-                : "border-gold/30 bg-gold/10 text-gold-deep hover:border-gold/50 hover:bg-gold/15"
+                : "border-gold/30 bg-gold/10 text-gold-deep hover:border-gold/50 hover:bg-gold/15",
             )}
           >
             {isRecording && (
-              <span className="absolute inset-0 animate-ping rounded-full border-2 border-error opacity-40" aria-hidden />
+              <span
+                className="absolute inset-0 animate-ping rounded-full border-2 border-error opacity-40"
+                aria-hidden
+              />
             )}
             <Microphone className="size-4" weight={isRecording ? "fill" : "regular"} />
           </button>
@@ -244,7 +249,7 @@ export function NaturalLanguageInput({
           autoFocus
           className={cn(
             "w-full resize-none rounded-3xl bg-transparent py-3.5 pl-4 text-sm leading-relaxed text-ivory placeholder:text-ivory/30 focus:outline-none",
-            voiceSupported && onVoiceSubmit ? "pr-24" : "pr-14"
+            voiceSupported && onVoiceSubmit ? "pr-24" : "pr-14",
           )}
         />
 
@@ -256,16 +261,23 @@ export function NaturalLanguageInput({
             aria-label={isRecording ? t.search.nlVoiceStopAria : t.search.nlVoiceStartAria}
             className={cn(
               "absolute bottom-2.5 right-14 flex size-9 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-              isRecording ? "bg-error text-white" : "bg-ivory/10 text-ivory hover:bg-gold/20"
+              isRecording ? "bg-error text-white" : "bg-ivory/10 text-ivory hover:bg-gold/20",
             )}
           >
             {isRecording && (
-              <span className="absolute inset-0 animate-ping rounded-full border-2 border-error opacity-40" aria-hidden />
+              <span
+                className="absolute inset-0 animate-ping rounded-full border-2 border-error opacity-40"
+                aria-hidden
+              />
             )}
             {isRecording ? (
               <span className="flex h-4 items-end gap-0.5" aria-hidden>
                 {[0, 1, 2, 3, 4].map((i) => (
-                  <span key={i} className="listening-bar w-0.5 rounded-full bg-white" style={{ animationDelay: `${i * 0.1}s` }} />
+                  <span
+                    key={i}
+                    className="listening-bar w-0.5 rounded-full bg-white"
+                    style={{ animationDelay: `${i * 0.1}s` }}
+                  />
                 ))}
               </span>
             ) : (
@@ -289,7 +301,11 @@ export function NaturalLanguageInput({
         <p className="flex items-center gap-2 px-1 text-xs font-medium text-error">
           <span className="flex h-3.5 items-end gap-0.5" aria-hidden>
             {[0, 1, 2, 3, 4].map((i) => (
-              <span key={i} className="listening-bar w-0.5 rounded-full bg-error" style={{ animationDelay: `${i * 0.1}s` }} />
+              <span
+                key={i}
+                className="listening-bar w-0.5 rounded-full bg-error"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              />
             ))}
           </span>
           {t.search.nlVoiceRecording}

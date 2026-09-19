@@ -5,8 +5,8 @@ import type { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { formatDateShort } from "@/lib/utils/format";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { formatDateShort } from "@/lib/utils/format";
 
 interface TravelDatePickerProps {
   departureDate: string;
@@ -19,7 +19,12 @@ function toIsoDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-export function TravelDatePicker({ departureDate, returnDate, onChange, error }: TravelDatePickerProps) {
+export function TravelDatePicker({
+  departureDate,
+  returnDate,
+  onChange,
+  error,
+}: TravelDatePickerProps) {
   const { t, locale } = useLocale();
   const range: DateRange | undefined = departureDate
     ? { from: new Date(departureDate), to: returnDate ? new Date(returnDate) : undefined }
@@ -44,7 +49,9 @@ export function TravelDatePicker({ departureDate, returnDate, onChange, error }:
               {formatDateShort(departureDate, locale)} — {formatDateShort(returnDate, locale)}
             </span>
           ) : (
-            <span className="min-w-0 flex-1 truncate text-left text-ivory/40">{t.search.datesPlaceholder}</span>
+            <span className="min-w-0 flex-1 truncate text-left text-ivory/40">
+              {t.search.datesPlaceholder}
+            </span>
           )}
         </PopoverTrigger>
         <PopoverContent className="w-auto p-2" align="start">

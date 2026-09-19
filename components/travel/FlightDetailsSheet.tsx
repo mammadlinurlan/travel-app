@@ -2,9 +2,9 @@
 
 import { Airplane, Suitcase } from "@phosphor-icons/react/dist/ssr";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { formatAmount, formatDateShort, formatDuration, formatTime } from "@/lib/utils/format";
-import { useLocale } from "@/lib/i18n/locale-context";
 import type { FlightOffer } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { formatAmount, formatDateShort, formatDuration, formatTime } from "@/lib/utils/format";
 
 interface FlightDetailsSheetProps {
   flight: FlightOffer | null;
@@ -34,13 +34,24 @@ export function FlightDetailsSheet({ flight, onOpenChange, onSelect }: FlightDet
               <FlightLegs flight={flight} locale={locale} />
 
               <div className="grid grid-cols-2 gap-3 rounded-xl border border-border bg-white p-4 text-sm">
-                <InfoRow label={t.packageDetails.totalFlightTime} value={formatDuration(flight.totalDurationMinutes)} />
+                <InfoRow
+                  label={t.packageDetails.totalFlightTime}
+                  value={formatDuration(flight.totalDurationMinutes)}
+                />
                 <InfoRow
                   label={t.packageCard.direct}
-                  value={flight.stops === 0 ? t.packageDetails.yes : t.packageCard.stops(flight.stops)}
+                  value={
+                    flight.stops === 0 ? t.packageDetails.yes : t.packageCard.stops(flight.stops)
+                  }
                 />
-                <InfoRow label={t.packageDetails.checkedBaggage} value={String(flight.baggage.checked)} />
-                <InfoRow label={t.packageDetails.cabinBaggage} value={String(flight.baggage.cabin)} />
+                <InfoRow
+                  label={t.packageDetails.checkedBaggage}
+                  value={String(flight.baggage.checked)}
+                />
+                <InfoRow
+                  label={t.packageDetails.cabinBaggage}
+                  value={String(flight.baggage.cabin)}
+                />
                 <InfoRow label={t.packageDetails.fare} value={flight.fareBrand} />
                 <InfoRow
                   label={t.packageDetails.refundable}
@@ -50,7 +61,9 @@ export function FlightDetailsSheet({ flight, onOpenChange, onSelect }: FlightDet
             </div>
 
             <div className="sticky bottom-0 mt-auto flex items-center justify-between gap-4 border-t border-border bg-white px-5 py-4">
-              <span className="text-xl font-semibold text-ink">{formatAmount(flight.price.amount, flight.price.currency)}</span>
+              <span className="text-xl font-semibold text-ink">
+                {formatAmount(flight.price.amount, flight.price.currency)}
+              </span>
               <button
                 type="button"
                 onClick={() => onSelect(flight)}
@@ -66,12 +79,20 @@ export function FlightDetailsSheet({ flight, onOpenChange, onSelect }: FlightDet
   );
 }
 
-function FlightLegs({ flight, locale }: { flight: FlightOffer; locale: Parameters<typeof formatTime>[1] }) {
+function FlightLegs({
+  flight,
+  locale,
+}: {
+  flight: FlightOffer;
+  locale: Parameters<typeof formatTime>[1];
+}) {
   const { t } = useLocale();
   return (
     <div className="flex flex-col gap-4">
       <Leg title={t.packageDetails.outbound} segments={flight.outbound} locale={locale} />
-      {flight.inbound.length > 0 && <Leg title={t.packageDetails.return} segments={flight.inbound} locale={locale} />}
+      {flight.inbound.length > 0 && (
+        <Leg title={t.packageDetails.return} segments={flight.inbound} locale={locale} />
+      )}
     </div>
   );
 }
@@ -108,8 +129,8 @@ function Leg({
                 formatDuration(
                   (new Date(segment.departureTime).getTime() -
                     new Date(segments[i - 1].arrivalTime).getTime()) /
-                    60000
-                )
+                    60000,
+                ),
               )}
             </p>
           )}
@@ -119,9 +140,11 @@ function Leg({
             <span className="text-xs text-ink-muted">· {segment.flightNumber}</span>
           </div>
           <p className="text-sm text-ink">
-            {segment.origin.code} → {segment.destination.code} · {formatDateShort(segment.departureTime, locale)},{" "}
+            {segment.origin.code} → {segment.destination.code} ·{" "}
+            {formatDateShort(segment.departureTime, locale)},{" "}
             {formatTime(segment.departureTime, locale)} —{" "}
-            {formatDateShort(segment.arrivalTime, locale) !== formatDateShort(segment.departureTime, locale) &&
+            {formatDateShort(segment.arrivalTime, locale) !==
+              formatDateShort(segment.departureTime, locale) &&
               `${formatDateShort(segment.arrivalTime, locale)}, `}
             {formatTime(segment.arrivalTime, locale)}
           </p>

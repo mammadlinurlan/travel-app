@@ -1,11 +1,11 @@
-import { MockFlightProvider } from "./flights/mock-flight-provider";
 import { DuffelFlightProvider } from "./flights/duffel-flight-provider";
 import type { FlightProvider } from "./flights/flight-provider";
+import { MockFlightProvider } from "./flights/mock-flight-provider";
+import { DuffelHotelProvider } from "./hotels/duffel-hotel-provider";
+import type { HotelProvider } from "./hotels/hotel-provider";
+import { LiteApiHotelProvider } from "./hotels/liteapi-hotel-provider";
 import { MockHotelProvider } from "./hotels/mock-hotel-provider";
 import { RateHawkHotelProvider } from "./hotels/ratehawk-hotel-provider";
-import { DuffelHotelProvider } from "./hotels/duffel-hotel-provider";
-import { LiteApiHotelProvider } from "./hotels/liteapi-hotel-provider";
-import type { HotelProvider } from "./hotels/hotel-provider";
 import { MockTransferProvider } from "./transfers/mock-transfer-provider";
 import { RateHawkTransferProvider } from "./transfers/ratehawk-transfer-provider";
 import type { TransferProvider } from "./transfers/transfer-provider";

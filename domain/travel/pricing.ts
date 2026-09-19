@@ -1,15 +1,15 @@
-import type { FlightOffer, HotelOffer, PriceBreakdown, Room, TransferOffer } from "./types";
 import { PRICING_CONFIG } from "@/lib/config/pricing-config";
+import type { FlightOffer, HotelOffer, PriceBreakdown, Room, TransferOffer } from "./types";
 
 export function calculatePriceBreakdown(
   flight: FlightOffer,
   room: Room,
-  transfer: TransferOffer | null
+  transfer: TransferOffer | null,
 ): PriceBreakdown {
   const supplierCost = flight.price.amount + room.price.amount + (transfer?.price.amount ?? 0);
   const markup = Math.max(
     Math.round(supplierCost * PRICING_CONFIG.markupPercentage),
-    PRICING_CONFIG.minimumMarkup
+    PRICING_CONFIG.minimumMarkup,
   );
 
   return {
@@ -23,5 +23,8 @@ export function calculatePriceBreakdown(
 }
 
 export function cheapestRoomFor(hotel: HotelOffer): Room {
-  return hotel.rooms.reduce((min, room) => (room.price.amount < min.price.amount ? room : min), hotel.rooms[0]);
+  return hotel.rooms.reduce(
+    (min, room) => (room.price.amount < min.price.amount ? room : min),
+    hotel.rooms[0],
+  );
 }

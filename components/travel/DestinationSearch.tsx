@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { MagnifyingGlass, MapPin } from "@phosphor-icons/react/dist/ssr";
-import { searchAirports } from "@/lib/api/client";
-import { DESTINATION_OPTIONS } from "@/providers/mock-data/destinations-client";
-import { cn } from "@/lib/utils";
-import { useLocale } from "@/lib/i18n/locale-context";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import type { Airport } from "@/domain/travel/types";
+import { searchAirports } from "@/lib/api/client";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
+import { DESTINATION_OPTIONS } from "@/providers/mock-data/destinations-client";
 
 interface DestinationSearchProps {
   value: string;
@@ -25,7 +25,12 @@ function useDebouncedValue(value: string, delayMs: number): string {
   return debounced;
 }
 
-export function DestinationSearch({ value, label: externalLabel, onChange, error }: DestinationSearchProps) {
+export function DestinationSearch({
+  value,
+  label: externalLabel,
+  onChange,
+  error,
+}: DestinationSearchProps) {
   const { t } = useLocale();
   const [query, setQuery] = useState("");
   const [label, setLabel] = useState("");
@@ -63,7 +68,10 @@ export function DestinationSearch({ value, label: externalLabel, onChange, error
       <label className="text-sm font-medium text-ivory/90">{t.search.destinationLabel}</label>
 
       <div className="relative">
-        <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gold" weight="regular" />
+        <MagnifyingGlass
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gold"
+          weight="regular"
+        />
         <input
           value={open ? query : label || value || query}
           onChange={(e) => {
@@ -127,7 +135,9 @@ export function DestinationSearch({ value, label: externalLabel, onChange, error
                   <span className="font-medium">{airport.city}</span>{" "}
                   <span className="text-ink-muted">— {airport.name}</span>
                 </span>
-                <span className={cn("shrink-0 text-xs font-semibold text-ink-muted")}>{airport.code}</span>
+                <span className={cn("shrink-0 text-xs font-semibold text-ink-muted")}>
+                  {airport.code}
+                </span>
               </button>
             ))}
         </div>

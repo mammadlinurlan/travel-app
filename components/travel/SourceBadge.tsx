@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import type { FlightOffer, HotelOffer, TransferOffer } from "@/domain/travel/types";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
 
 interface SourceBadgeProps {
   kind: "flight" | "hotel" | "transfer";
@@ -23,7 +23,7 @@ export function SourceBadge({ kind, supplier, className }: SourceBadgeProps) {
     <span
       className={cn(
         "inline-flex w-fit items-center rounded-full border border-border bg-sand/70 px-2 py-0.5 text-[11px] font-medium text-ink-muted",
-        className
+        className,
       )}
     >
       {label}

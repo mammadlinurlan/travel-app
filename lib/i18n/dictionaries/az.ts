@@ -1,9 +1,9 @@
 import type {
-  MealPlan,
   CabinClass,
-  PackageCategory,
   FlightOffer,
   HotelOffer,
+  MealPlan,
+  PackageCategory,
   TransferOffer,
 } from "@/domain/travel/types";
 
@@ -14,10 +14,7 @@ export const az = {
   },
   nav: {
     explore: "Axtar",
-    myTrips: "Səfərlərim",
     help: "Kömək",
-    account: "Hesab",
-    accountAria: "Hesab",
   },
   hero: {
     eyebrow: "AI Səyahət Axtarışı",
@@ -57,14 +54,17 @@ export const az = {
     nlFillPending: "Oxunur…",
     nlFillCta: "Axtar",
     nlFillSuccess: "Aşağıdakı form dolduruldu — nəzərdən keçirin.",
-    nlMissingDestination: "Hara getmək istədiyinizi başa düşmədik — zəhmət olmasa istiqaməti seçin.",
-    nlMissingDates: "Nə vaxt səyahət etmək istədiyinizi başa düşmədik — zəhmət olmasa tarixləri seçin.",
+    nlMissingDestination:
+      "Hara getmək istədiyinizi başa düşmədik — zəhmət olmasa istiqaməti seçin.",
+    nlMissingDates:
+      "Nə vaxt səyahət etmək istədiyinizi başa düşmədik — zəhmət olmasa tarixləri seçin.",
     nlMissingBoth: "Anlaya bilmədik — zəhmət olmasa sahələri özünüz doldurun.",
     nlVoiceStartAria: "Səsli axtarışı başlat",
     nlVoiceStopAria: "Səsli axtarışı dayandır",
     nlVoiceRecording: "Dinlənilir… bitirmək üçün yenidən klikləyin",
     nlVoiceProcessing: "Səsiniz təhlil edilir…",
-    nlVoicePermissionDenied: "Mikrofona icazə verilmədi — zəhmət olmasa brauzer ayarlarından icazə verin.",
+    nlVoicePermissionDenied:
+      "Mikrofona icazə verilmədi — zəhmət olmasa brauzer ayarlarından icazə verin.",
     nlVoiceUnsupportedTitle: "Bu brauzerdə səsli axtarış dəstəklənmir",
     nlVoiceError: "Səsi başa düşə bilmədik — zəhmət olmasa yenidən cəhd edin və ya yazın.",
     trustNote: "Uçuşlar və otellər üzrə canlı axtarış",
@@ -84,7 +84,11 @@ export const az = {
       "Aeroport transferləri axtarılır",
       "Mükəmməl səfəriniz hazırlanır",
     ],
-    sideLabels: ["Yaxşı\nsəfərlər\nqarşıda", "Səyahətin\ndaha mənalı\nyolu", "Bəzi yerlər\nhəmişəlik\nqalır"],
+    sideLabels: [
+      "Yaxşı\nsəfərlər\nqarşıda",
+      "Səyahətin\ndaha mənalı\nyolu",
+      "Bəzi yerlər\nhəmişəlik\nqalır",
+    ],
   },
   toolbar: {
     newSearch: "Yeni axtarış",
@@ -128,7 +132,8 @@ export const az = {
     transfer_unavailable: "Canlı transfer seçimi tapa bilmədik. Transfersiz davam edə bilərsiniz.",
     no_flights_route: "Bu marşrut üçün canlı uçuş seçimi tapa bilmədik.",
     no_hotels_dates: "Bu tarixlər üçün otel müvcudluğu tapa bilmədik.",
-    hotel_star_mismatch: "Ulduz seçiminizə tam uyğun otel tapılmadı — ən yaxın seçimlər göstərilir.",
+    hotel_star_mismatch:
+      "Ulduz seçiminizə tam uyğun otel tapılmadı — ən yaxın seçimlər göstərilir.",
     no_complete_trip: "Mövcud imkanlardan tam səfər tərtib edə bilmədik.",
   },
   filters: {
@@ -163,7 +168,8 @@ export const az = {
     perPerson: "nəfər başına",
     viewTrip: "Səfərə bax",
     viewTripAria: (city: string, hotel: string) => `${city} şəhərinə, ${hotel} otelinə səfərə bax`,
-    checkedBags: (count: number) => (count === 1 ? "1 çamadan daxildir" : `${count} çamadan daxildir`),
+    checkedBags: (count: number) =>
+      count === 1 ? "1 çamadan daxildir" : `${count} çamadan daxildir`,
     moreInclusions: (count: number) => `+${count} daha`,
     starHotelAria: (stars: number) => `${stars} ulduzlu otel`,
     reviews: (count: number) => `· ${count.toLocaleString("az")} rəy`,

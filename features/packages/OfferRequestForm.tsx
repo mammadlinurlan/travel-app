@@ -1,8 +1,8 @@
 "use client";
 
+import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { requestOffer } from "@/lib/api/client";
@@ -65,7 +65,9 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
               className="h-11 rounded-lg border border-border bg-white px-3 text-sm focus:border-navy focus:outline-none"
             />
             {field.state.meta.errors[0] && (
-              <p className="text-xs text-error">{String(field.state.meta.errors[0]?.message ?? field.state.meta.errors[0])}</p>
+              <p className="text-xs text-error">
+                {String(field.state.meta.errors[0]?.message ?? field.state.meta.errors[0])}
+              </p>
             )}
           </div>
         )}
@@ -84,7 +86,9 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
               className="h-11 rounded-lg border border-border bg-white px-3 text-sm focus:border-navy focus:outline-none"
             />
             {field.state.meta.errors[0] && (
-              <p className="text-xs text-error">{String(field.state.meta.errors[0]?.message ?? field.state.meta.errors[0])}</p>
+              <p className="text-xs text-error">
+                {String(field.state.meta.errors[0]?.message ?? field.state.meta.errors[0])}
+              </p>
             )}
           </div>
         )}
@@ -117,9 +121,15 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
         )}
       </form.Field>
 
-      {mutation.isError && <p className="text-sm text-error">{(mutation.error as Error).message}</p>}
+      {mutation.isError && (
+        <p className="text-sm text-error">{(mutation.error as Error).message}</p>
+      )}
 
-      <Button type="submit" disabled={mutation.isPending} className="mt-1 h-12 bg-navy text-ivory hover:bg-navy-deep">
+      <Button
+        type="submit"
+        disabled={mutation.isPending}
+        className="mt-1 h-12 bg-navy text-ivory hover:bg-navy-deep"
+      >
         {mutation.isPending ? t.offerForm.sendPending : t.offerForm.sendCta}
       </Button>
     </form>

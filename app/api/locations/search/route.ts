@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { getLocationProvider } from "@/providers/location/location-provider";
 
 export async function GET(request: NextRequest) {

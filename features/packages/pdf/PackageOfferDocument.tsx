@@ -1,7 +1,13 @@
-import { Document, Page, View, Text, Font, StyleSheet } from "@react-pdf/renderer";
+import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import type { TravelPackage } from "@/domain/travel/types";
 import type { Dictionary, Locale } from "@/lib/i18n/locale-context";
-import { formatDateRange, formatDateShort, formatDuration, formatMoney, formatTime } from "@/lib/utils/format";
+import {
+  formatDateRange,
+  formatDateShort,
+  formatDuration,
+  formatMoney,
+  formatTime,
+} from "@/lib/utils/format";
 
 Font.register({
   family: "Inter",
@@ -148,7 +154,10 @@ function FlightLegBlock({
         label={`${first.origin.code} → ${last.destination.code}`}
         value={`${formatDateShort(first.departureTime, locale)} · ${formatTime(first.departureTime, locale)} — ${formatTime(last.arrivalTime, locale)}`}
       />
-      <DetailRow label={t.packageDetails.fare} value={`${first.airline} · ${t.cabinClass[first.cabin]}`} />
+      <DetailRow
+        label={t.packageDetails.fare}
+        value={`${first.airline} · ${t.cabinClass[first.cabin]}`}
+      />
     </View>
   );
 }
@@ -169,26 +178,49 @@ export function PackageOfferDocument({ pkg, travelerCount, t, locale }: PackageO
           {destinationCity} · {pkg.hotel.name}
         </Text>
         <Text style={styles.heroSubtitle}>
-          {formatDateRange(pkg.flight.outbound[0].departureTime, pkg.flight.inbound[0].departureTime, locale)} ·{" "}
-          {t.pdf.traveler(travelerCount)}
+          {formatDateRange(
+            pkg.flight.outbound[0].departureTime,
+            pkg.flight.inbound[0].departureTime,
+            locale,
+          )}{" "}
+          · {t.pdf.traveler(travelerCount)}
         </Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.pdf.hotelSection}</Text>
           <DetailRow label={pkg.hotel.name} value={`${pkg.hotel.stars}★`} />
-          {pkg.hotel.address && <DetailRow label={t.packageDetails.room} value={pkg.hotel.address} />}
+          {pkg.hotel.address && (
+            <DetailRow label={t.packageDetails.room} value={pkg.hotel.address} />
+          )}
           <DetailRow label={t.packageDetails.room} value={pkg.room.name} />
-          <DetailRow label={t.packageDetails.mealPlan} value={t.mealPlanLabels[pkg.room.mealPlan]} />
+          <DetailRow
+            label={t.packageDetails.mealPlan}
+            value={t.mealPlanLabels[pkg.room.mealPlan]}
+          />
           <DetailRow
             label={t.packageDetails.cancellation}
-            value={pkg.room.refundable ? t.packageDetails.freeCancellation : t.packageDetails.nonRefundable}
+            value={
+              pkg.room.refundable
+                ? t.packageDetails.freeCancellation
+                : t.packageDetails.nonRefundable
+            }
           />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.pdf.flightSection}</Text>
-          <FlightLegBlock label={t.packageDetails.outbound} segments={pkg.flight.outbound} t={t} locale={locale} />
-          <FlightLegBlock label={t.packageDetails.return} segments={pkg.flight.inbound} t={t} locale={locale} />
+          <FlightLegBlock
+            label={t.packageDetails.outbound}
+            segments={pkg.flight.outbound}
+            t={t}
+            locale={locale}
+          />
+          <FlightLegBlock
+            label={t.packageDetails.return}
+            segments={pkg.flight.inbound}
+            t={t}
+            locale={locale}
+          />
           <View style={{ marginTop: 6 }}>
             <DetailRow
               label={t.packageDetails.checkedBaggage}
@@ -198,7 +230,10 @@ export function PackageOfferDocument({ pkg, travelerCount, t, locale }: PackageO
                   : t.packageDetails.notIncluded
               }
             />
-            <DetailRow label={t.packageDetails.totalFlightTime} value={formatDuration(pkg.flight.totalDurationMinutes)} />
+            <DetailRow
+              label={t.packageDetails.totalFlightTime}
+              value={formatDuration(pkg.flight.totalDurationMinutes)}
+            />
           </View>
         </View>
 
@@ -206,22 +241,41 @@ export function PackageOfferDocument({ pkg, travelerCount, t, locale }: PackageO
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t.pdf.transferSection}</Text>
             <DetailRow
-              label={pkg.transfer.type === "private" ? t.packageDetails.private : t.packageDetails.shared}
+              label={
+                pkg.transfer.type === "private" ? t.packageDetails.private : t.packageDetails.shared
+              }
               value={pkg.transfer.vehicle}
             />
-            <DetailRow label={t.packageDetails.transferTime} value={formatDuration(pkg.transfer.durationMinutes)} />
+            <DetailRow
+              label={t.packageDetails.transferTime}
+              value={formatDuration(pkg.transfer.durationMinutes)}
+            />
           </View>
         )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t.pdf.priceSection}</Text>
-          <DetailRow label={t.packageDetails.flights} value={formatMoney({ amount: pkg.price.flights, currency: pkg.price.currency })} />
-          <DetailRow label={t.packageDetails.hotel} value={formatMoney({ amount: pkg.price.hotel, currency: pkg.price.currency })} />
-          <DetailRow label={t.packageDetails.transferLabel} value={formatMoney({ amount: pkg.price.transfer, currency: pkg.price.currency })} />
-          <DetailRow label={t.packageDetails.serviceAndBooking} value={formatMoney({ amount: pkg.price.markup, currency: pkg.price.currency })} />
+          <DetailRow
+            label={t.packageDetails.flights}
+            value={formatMoney({ amount: pkg.price.flights, currency: pkg.price.currency })}
+          />
+          <DetailRow
+            label={t.packageDetails.hotel}
+            value={formatMoney({ amount: pkg.price.hotel, currency: pkg.price.currency })}
+          />
+          <DetailRow
+            label={t.packageDetails.transferLabel}
+            value={formatMoney({ amount: pkg.price.transfer, currency: pkg.price.currency })}
+          />
+          <DetailRow
+            label={t.packageDetails.serviceAndBooking}
+            value={formatMoney({ amount: pkg.price.markup, currency: pkg.price.currency })}
+          />
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>{t.pdf.total}</Text>
-            <Text style={styles.totalValue}>{formatMoney({ amount: pkg.price.total, currency: pkg.price.currency })}</Text>
+            <Text style={styles.totalValue}>
+              {formatMoney({ amount: pkg.price.total, currency: pkg.price.currency })}
+            </Text>
           </View>
         </View>
 

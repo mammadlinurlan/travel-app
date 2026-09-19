@@ -1,22 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { ArrowRight, Car, Lightning } from "@phosphor-icons/react/dist/ssr";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useForm } from "@tanstack/react-form";
+import { useMemo, useState } from "react";
 import { DestinationSearch } from "@/components/travel/DestinationSearch";
+import { NaturalLanguageInput } from "@/components/travel/NaturalLanguageInput";
 import { TravelDatePicker } from "@/components/travel/TravelDatePicker";
 import { TravelerSelector } from "@/components/travel/TravelerSelector";
-import { NaturalLanguageInput } from "@/components/travel/NaturalLanguageInput";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { TripSearchRequest } from "@/domain/travel/types";
 import { useLocale } from "@/lib/i18n/locale-context";
 import {
   createTripSearchFormSchema,
   defaultTripSearchValues,
-  toTripSearchRequest,
   type TripSearchFormValues,
+  toTripSearchRequest,
 } from "./schema";
-import type { TripSearchRequest } from "@/domain/travel/types";
 
 interface TripSearchFormProps {
   onSubmit: (request: TripSearchRequest) => void;
@@ -54,7 +54,7 @@ export function TripSearchForm({
         pickReturnDate: t.search.pickReturnDate,
         returnAfterDeparture: t.search.returnAfterDeparture,
       }),
-    [t]
+    [t],
   );
 
   const form = useForm({
@@ -122,7 +122,11 @@ export function TripSearchForm({
                 <form.Field name="infants">
                   {(infants) => (
                     <TravelerSelector
-                      value={{ adults: adults.state.value, children: children.state.value, infants: infants.state.value }}
+                      value={{
+                        adults: adults.state.value,
+                        children: children.state.value,
+                        infants: infants.state.value,
+                      }}
                       onChange={(value) => {
                         adults.handleChange(value.adults);
                         children.handleChange(value.children);
@@ -141,7 +145,10 @@ export function TripSearchForm({
         <form.Field name="transferRequired">
           {(field) => (
             <label className="flex items-center gap-2 rounded-full border border-ivory/15 bg-ivory/[0.05] py-1.5 pl-2 pr-3 text-sm text-ivory/90">
-              <Checkbox checked={field.state.value} onCheckedChange={(v) => field.handleChange(Boolean(v))} />
+              <Checkbox
+                checked={field.state.value}
+                onCheckedChange={(v) => field.handleChange(Boolean(v))}
+              />
               <Car className="size-4 text-gold" weight="regular" />
               {t.search.airportTransfer}
             </label>
@@ -151,9 +158,7 @@ export function TripSearchForm({
 
       <form.Subscribe selector={(state) => state.errorMap}>
         {(errorMap) =>
-          errorMap.onSubmit ? (
-            <p className="text-sm text-error">{t.search.formError}</p>
-          ) : null
+          errorMap.onSubmit ? <p className="text-sm text-error">{t.search.formError}</p> : null
         }
       </form.Subscribe>
 

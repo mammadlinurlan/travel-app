@@ -2,9 +2,9 @@
 
 import { ArrowLeft, MagnifyingGlass, SlidersHorizontal } from "@phosphor-icons/react/dist/ssr";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
-import { SORT_MODES, type SortMode } from "./PackageFilters";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
+import { SORT_MODES, type SortMode } from "./PackageFilters";
 
 export type ResultsViewMode = "flights" | "hotels" | "tours";
 
@@ -73,7 +73,7 @@ export function ResultsToolbar({
                 aria-pressed={viewMode === mode}
                 className={cn(
                   "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
-                  viewMode === mode ? "bg-navy text-white" : "text-ink-muted hover:text-ink"
+                  viewMode === mode ? "bg-navy text-white" : "text-ink-muted hover:text-ink",
                 )}
               >
                 {t.toolbar.viewTab[mode]}
@@ -105,7 +105,9 @@ export function ResultsToolbar({
             onClick={onOpenFilters}
             className={cn(
               "flex items-center gap-2 rounded-full border bg-white px-3.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 lg:hidden",
-              activeFilterCount > 0 ? "border-gold/60 bg-gold/10 text-gold-deep" : "border-border text-ink hover:bg-sand"
+              activeFilterCount > 0
+                ? "border-gold/60 bg-gold/10 text-gold-deep"
+                : "border-border text-ink hover:bg-sand",
             )}
           >
             <SlidersHorizontal className="size-4" weight="regular" aria-hidden />

@@ -2,8 +2,8 @@
 
 import { ArrowLeft, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { PackageOfferCard } from "@/components/travel/PackageOfferCard";
-import { useLocale } from "@/lib/i18n/locale-context";
 import type { TravelPackage } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 interface PackagesOfferViewProps {
   packages: TravelPackage[];
@@ -14,10 +14,19 @@ interface PackagesOfferViewProps {
 }
 
 /** The dedicated "Paket Qur" result: cheapest / best value / premium, three cards only. */
-export function PackagesOfferView({ packages, travelerCount, tripSummary, onSelect, onBack }: PackagesOfferViewProps) {
+export function PackagesOfferView({
+  packages,
+  travelerCount,
+  tripSummary,
+  onSelect,
+  onBack,
+}: Readonly<PackagesOfferViewProps>) {
   const { t } = useLocale();
   const offers = packages.filter(
-    (pkg) => pkg.score.category === "cheapest" || pkg.score.category === "best_value" || pkg.score.category === "premium"
+    (pkg) =>
+      pkg.score.category === "cheapest" ||
+      pkg.score.category === "best_value" ||
+      pkg.score.category === "premium",
   );
 
   return (
@@ -27,7 +36,11 @@ export function PackagesOfferView({ packages, travelerCount, tripSummary, onSele
         onClick={onBack}
         className="group flex w-fit items-center gap-1.5 self-start rounded-lg text-sm font-medium text-ink-muted transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
       >
-        <ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" weight="bold" aria-hidden />
+        <ArrowLeft
+          className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5"
+          weight="bold"
+          aria-hidden
+        />
         {t.packagesOffer.backToResults}
       </button>
 
@@ -50,7 +63,12 @@ export function PackagesOfferView({ packages, travelerCount, tripSummary, onSele
       ) : (
         <div className="grid w-full grid-cols-1 items-start gap-5 text-left sm:grid-cols-2 xl:grid-cols-3">
           {offers.map((pkg) => (
-            <PackageOfferCard key={pkg.id} pkg={pkg} travelerCount={travelerCount} onView={onSelect} />
+            <PackageOfferCard
+              key={pkg.id}
+              pkg={pkg}
+              travelerCount={travelerCount}
+              onView={onSelect}
+            />
           ))}
         </div>
       )}

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { nlpTripRequestSchema, parsedTripIntentSchema } from "@/domain/travel/validation";
 import { getLocationProvider } from "@/providers/location/location-provider";
 
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   if (!apiKey) {
     return NextResponse.json(
       { error: "Natural-language search isn't configured. Use the form fields instead." },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
           },
         }),
         signal: AbortSignal.timeout(20_000),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     console.error("AI trip parsing failed", error);
     return NextResponse.json(
       { error: "We couldn't understand that just now — try the form fields instead." },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }

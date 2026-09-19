@@ -34,12 +34,7 @@ export interface Travelers {
 
 export type CabinClass = "economy" | "premium_economy" | "business" | "first";
 
-export type MealPlan =
-  | "room_only"
-  | "breakfast"
-  | "half_board"
-  | "full_board"
-  | "all_inclusive";
+export type MealPlan = "room_only" | "breakfast" | "half_board" | "full_board" | "all_inclusive";
 
 export interface Baggage {
   checked: number; // pieces included
@@ -136,11 +131,7 @@ export interface PriceBreakdown {
   currency: Currency;
 }
 
-export type PackageCategory =
-  | "cheapest"
-  | "best_value"
-  | "premium"
-  | "alternative";
+export type PackageCategory = "cheapest" | "best_value" | "premium" | "alternative";
 
 export type ScoreReasonKey =
   | "topHotel"

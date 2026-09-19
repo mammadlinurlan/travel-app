@@ -7,12 +7,32 @@ const INTL_LOCALE: Record<Locale, string> = { az: "az-AZ", en: "en-US" };
 // (falls back to garbled digits), so month labels are mapped by hand.
 const MONTH_NAMES: Record<Locale, string[]> = {
   az: [
-    "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
-    "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr",
+    "Yanvar",
+    "Fevral",
+    "Mart",
+    "Aprel",
+    "May",
+    "İyun",
+    "İyul",
+    "Avqust",
+    "Sentyabr",
+    "Oktyabr",
+    "Noyabr",
+    "Dekabr",
   ],
   en: [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ],
 };
 
@@ -44,7 +64,10 @@ export function formatDateShort(iso: string, locale: Locale = "az"): string {
 }
 
 export function formatTime(iso: string, locale: Locale = "az"): string {
-  return new Date(iso).toLocaleTimeString(INTL_LOCALE[locale], { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString(INTL_LOCALE[locale], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function formatDateRange(startIso: string, endIso: string, locale: Locale = "az"): string {

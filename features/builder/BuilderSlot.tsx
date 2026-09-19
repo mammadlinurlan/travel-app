@@ -2,8 +2,8 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import { X } from "@phosphor-icons/react/dist/ssr";
-import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
 import type { SlotType } from "./types";
 
 interface BuilderSlotProps {
@@ -18,7 +18,17 @@ interface BuilderSlotProps {
   onClear?: () => void;
 }
 
-export function BuilderSlot({ slotType, label, icon, filled, badge, title, detail, price, onClear }: BuilderSlotProps) {
+export function BuilderSlot({
+  slotType,
+  label,
+  icon,
+  filled,
+  badge,
+  title,
+  detail,
+  price,
+  onClear,
+}: BuilderSlotProps) {
   const { t } = useLocale();
   const { setNodeRef, isOver } = useDroppable({ id: `slot-${slotType}`, data: { type: slotType } });
 
@@ -27,7 +37,7 @@ export function BuilderSlot({ slotType, label, icon, filled, badge, title, detai
       ref={setNodeRef}
       className={cn(
         "rounded-2xl border-2 border-dashed transition-colors",
-        isOver ? "drag-over" : filled ? "border-transparent bg-sand" : "border-border/70 bg-white"
+        isOver ? "drag-over" : filled ? "border-transparent bg-sand" : "border-border/70 bg-white",
       )}
     >
       {filled ? (
@@ -37,7 +47,9 @@ export function BuilderSlot({ slotType, label, icon, filled, badge, title, detai
           </div>
           <div className="min-w-0 flex-1">
             <div className="mb-0.5 flex flex-wrap items-center gap-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-ink-muted">{label}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+                {label}
+              </span>
               {badge}
             </div>
             <p className="truncate text-sm font-semibold text-ink">{title}</p>
@@ -62,7 +74,9 @@ export function BuilderSlot({ slotType, label, icon, filled, badge, title, detai
           <span className="text-navy/40">{icon}</span>
           <p className="text-[11px] font-medium text-ink-muted">
             {label} — {t.builder.dropPlaceholder}
-            <span className="mt-0.5 block text-[10px] text-ink-muted/70 sm:hidden">{t.builder.tapToAdd}</span>
+            <span className="mt-0.5 block text-[10px] text-ink-muted/70 sm:hidden">
+              {t.builder.tapToAdd}
+            </span>
           </p>
         </div>
       )}

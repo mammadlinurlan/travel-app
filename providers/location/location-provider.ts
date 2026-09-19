@@ -17,7 +17,13 @@ export class MockLocationProvider implements LocationProvider {
     const { listDestinations } = await import("@/providers/mock-data/destinations");
     const q = query.trim().toLowerCase();
     return listDestinations()
-      .filter((d) => !q || d.city.toLowerCase().includes(q) || d.country.toLowerCase().includes(q) || d.code.toLowerCase().includes(q))
+      .filter(
+        (d) =>
+          !q ||
+          d.city.toLowerCase().includes(q) ||
+          d.country.toLowerCase().includes(q) ||
+          d.code.toLowerCase().includes(q),
+      )
       .map((d) => ({
         id: d.code,
         city: d.city,
@@ -32,7 +38,7 @@ export class MockLocationProvider implements LocationProvider {
     const q = query.trim().toLowerCase();
     const airports = [ORIGIN, ...listDestinations().map((d) => d.airport)];
     return airports.filter(
-      (a) => !q || a.city.toLowerCase().includes(q) || a.code.toLowerCase().includes(q)
+      (a) => !q || a.city.toLowerCase().includes(q) || a.code.toLowerCase().includes(q),
     );
   }
 }

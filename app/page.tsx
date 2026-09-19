@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { TripSearchForm } from "@/features/search/TripSearchForm";
-import { useTripSearch } from "@/features/search/use-trip-search";
-import { useParseTrip, useParseTripVoice } from "@/features/search/use-parse-trip";
-import { defaultTripSearchValues, toTripSearchRequest, type TripSearchFormValues } from "@/features/search/schema";
-import type { ParsedTripIntent } from "@/domain/travel/validation";
-import { SearchProgress, SEARCH_PROGRESS_MIN_DURATION_MS } from "@/components/travel/SearchProgress";
-import { PackageResults } from "@/features/packages/PackageResults";
-import { PackageDetails } from "@/features/packages/PackageDetails";
-import { BuilderView } from "@/features/builder/BuilderView";
-import type { InventoryItemData } from "@/features/builder/types";
-import { useLocale } from "@/lib/i18n/locale-context";
+import {
+  SEARCH_PROGRESS_MIN_DURATION_MS,
+  SearchProgress,
+} from "@/components/travel/SearchProgress";
 import type {
   CabinClass,
   FlightOffer,
@@ -24,6 +17,20 @@ import type {
   TripSearchRequest,
   TripSearchResult,
 } from "@/domain/travel/types";
+import type { ParsedTripIntent } from "@/domain/travel/validation";
+import { BuilderView } from "@/features/builder/BuilderView";
+import type { InventoryItemData } from "@/features/builder/types";
+import { PackageDetails } from "@/features/packages/PackageDetails";
+import { PackageResults } from "@/features/packages/PackageResults";
+import {
+  defaultTripSearchValues,
+  type TripSearchFormValues,
+  toTripSearchRequest,
+} from "@/features/search/schema";
+import { TripSearchForm } from "@/features/search/TripSearchForm";
+import { useParseTrip, useParseTripVoice } from "@/features/search/use-parse-trip";
+import { useTripSearch } from "@/features/search/use-trip-search";
+import { useLocale } from "@/lib/i18n/locale-context";
 
 type View = "landing" | "searching" | "builder";
 
@@ -69,7 +76,7 @@ export default function Home() {
           ? t.search.nlMissingBoth
           : missingDestination
             ? t.search.nlMissingDestination
-            : t.search.nlMissingDates
+            : t.search.nlMissingDates,
       );
       setNlPrefill({
         values: {
@@ -131,7 +138,7 @@ export default function Home() {
           setNlError(error.message);
           setView("landing");
         },
-      }
+      },
     );
   }
 
@@ -162,7 +169,10 @@ export default function Home() {
 
   function handleCabinClassChange(cabinClass: CabinClass) {
     if (!lastRequest) return;
-    const request: TripSearchRequest = { ...lastRequest, preferences: { ...lastRequest.preferences, cabinClass } };
+    const request: TripSearchRequest = {
+      ...lastRequest,
+      preferences: { ...lastRequest.preferences, cabinClass },
+    };
     setLastRequest(request);
     search.mutate(request, {
       onSuccess: (data) => setResult(data),
@@ -180,7 +190,7 @@ export default function Home() {
     setResult((prev) =>
       prev
         ? { ...prev, packages: prev.packages.map((p) => (p.id === updated.id ? updated : p)) }
-        : prev
+        : prev,
     );
   }
 
@@ -188,7 +198,12 @@ export default function Home() {
     <main className="flex flex-1 flex-col bg-background">
       <AnimatePresence mode="wait">
         {view === "landing" && (
-          <motion.div key="landing" exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="h-dvh">
+          <motion.div
+            key="landing"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="min-h-dvh"
+          >
             <Hero>
               <TripSearchForm
                 onSubmit={handleSubmit}
@@ -207,7 +222,13 @@ export default function Home() {
         )}
 
         {view === "searching" && !showResults && (
-          <motion.div key="searching" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-dvh">
+          <motion.div
+            key="searching"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="h-dvh"
+          >
             <SearchProgress onHome={handleNewSearch} />
           </motion.div>
         )}
@@ -270,7 +291,7 @@ export default function Home() {
 function Hero({ children }: { children: React.ReactNode }) {
   const { t } = useLocale();
   return (
-    <section className="relative flex h-full flex-col overflow-hidden bg-navy-deep">
+    <section className="relative flex min-h-dvh flex-col overflow-hidden bg-navy-deep">
       <Image
         src="/hero-bg.jpg"
         alt=""
@@ -307,14 +328,16 @@ function Hero({ children }: { children: React.ReactNode }) {
         TripSearchForm (voice recording, async parsing) would double-mount
         hooks and side effects, which is unsafe here.
       */}
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-8 overflow-y-auto px-4 pb-6 pt-20 sm:gap-10 sm:px-6 md:flex-row md:items-center md:gap-12 md:px-10 md:py-12 lg:gap-20">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center gap-8 px-4 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-[calc(6rem+env(safe-area-inset-top))] sm:gap-10 sm:px-6 md:flex-row md:items-center md:gap-12 md:px-10 md:pb-12 md:pt-[calc(6rem+env(safe-area-inset-top))] lg:gap-20">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="flex min-w-0 shrink-0 flex-col items-center gap-2 text-center sm:gap-3 md:flex-1 md:items-start md:text-left"
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">{t.hero.eyebrow}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+            {t.hero.eyebrow}
+          </p>
           <h1
             className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-[40px] md:leading-[1.08]"
             style={{ fontSize: "clamp(1.875rem, 4vw, 3.5rem)" }}

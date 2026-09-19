@@ -1,14 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
 import { Airplane, ArrowRight, Buildings, Star } from "@phosphor-icons/react/dist/ssr";
-import type { FlightOffer, HotelOffer, Room, TravelPackage } from "@/domain/travel/types";
-import { cheapestRoomFor } from "@/domain/travel/pricing";
+import Image from "next/image";
+import { useMemo, useState } from "react";
 import { FlightDetailsSheet } from "@/components/travel/FlightDetailsSheet";
 import { HotelDetailsSheet } from "@/components/travel/HotelDetailsSheet";
-import { formatAmount, formatDateShort, formatTime } from "@/lib/utils/format";
+import { cheapestRoomFor } from "@/domain/travel/pricing";
+import type { FlightOffer, HotelOffer, Room, TravelPackage } from "@/domain/travel/types";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { formatAmount, formatDateShort, formatTime } from "@/lib/utils/format";
 
 interface SourceGroupedResultsProps {
   packages: TravelPackage[];
@@ -20,7 +20,7 @@ interface SourceGroupedResultsProps {
 function groupUnique<S extends string>(
   packages: TravelPackage[],
   idOf: (pkg: TravelPackage) => string,
-  supplierOf: (pkg: TravelPackage) => S
+  supplierOf: (pkg: TravelPackage) => S,
 ): Map<S, TravelPackage[]> {
   const seen = new Set<string>();
   const groups = new Map<S, TravelPackage[]>();
@@ -37,11 +37,23 @@ function groupUnique<S extends string>(
 }
 
 /** Both category sections stacked — kept for callers that still want the combined view. */
-export function SourceGroupedResults({ packages, onSelectFlight, onSelectHotel }: SourceGroupedResultsProps) {
+export function SourceGroupedResults({
+  packages,
+  onSelectFlight,
+  onSelectHotel,
+}: SourceGroupedResultsProps) {
   return (
     <div className="flex flex-col gap-10">
-      <FlightsList packages={packages} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
-      <HotelsList packages={packages} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
+      <FlightsList
+        packages={packages}
+        onSelectFlight={onSelectFlight}
+        onSelectHotel={onSelectHotel}
+      />
+      <HotelsList
+        packages={packages}
+        onSelectFlight={onSelectFlight}
+        onSelectHotel={onSelectHotel}
+      />
     </div>
   );
 }
@@ -52,12 +64,17 @@ export function FlightsList({ packages, onSelectFlight }: SourceGroupedResultsPr
   const [openFlight, setOpenFlight] = useState<FlightOffer | null>(null);
 
   const flightGroups = useMemo(
-    () => groupUnique(packages, (pkg) => pkg.flight.id, (pkg) => pkg.flight.supplier),
-    [packages]
+    () =>
+      groupUnique(
+        packages,
+        (pkg) => pkg.flight.id,
+        (pkg) => pkg.flight.supplier,
+      ),
+    [packages],
   );
   const flightCount = useMemo(
     () => [...flightGroups.values()].reduce((sum, items) => sum + items.length, 0),
-    [flightGroups]
+    [flightGroups],
   );
 
   return (
@@ -69,7 +86,9 @@ export function FlightsList({ packages, onSelectFlight }: SourceGroupedResultsPr
           </span>
           <div>
             <h2 className="text-sm font-semibold text-ink">{t.sourceGrouped.flightsHeading}</h2>
-            <p className="text-[11px] text-ink-muted">{t.sourceGrouped.resultsCount(flightCount)}</p>
+            <p className="text-[11px] text-ink-muted">
+              {t.sourceGrouped.resultsCount(flightCount)}
+            </p>
           </div>
         </div>
         {flightGroups.size === 0 ? (
@@ -93,15 +112,18 @@ export function FlightsList({ packages, onSelectFlight }: SourceGroupedResultsPr
                         <span className="truncate">{firstLeg.airline}</span>
                       </div>
                       <p className="text-[15px] font-semibold tracking-tight text-ink">
-                        {firstLeg.origin.code} <span className="text-ink-muted">→</span> {lastLeg.destination.code}
+                        {firstLeg.origin.code} <span className="text-ink-muted">→</span>{" "}
+                        {lastLeg.destination.code}
                       </p>
                       <p className="text-[13px] text-ink">
-                        {formatDateShort(firstLeg.departureTime, locale)}, {formatTime(firstLeg.departureTime, locale)} —{" "}
+                        {formatDateShort(firstLeg.departureTime, locale)},{" "}
+                        {formatTime(firstLeg.departureTime, locale)} —{" "}
                         {formatTime(lastLeg.arrivalTime, locale)}
                       </p>
                       <div className="mt-1 flex items-center justify-between border-t border-border pt-2">
                         <span className="text-sm font-semibold text-ink">
-                          {t.sourceGrouped.fromPrice} {formatAmount(pkg.flight.price.amount, pkg.flight.price.currency)}
+                          {t.sourceGrouped.fromPrice}{" "}
+                          {formatAmount(pkg.flight.price.amount, pkg.flight.price.currency)}
                         </span>
                         <ArrowRight
                           className="size-4 text-navy transition-transform duration-200 group-hover:translate-x-0.5"
@@ -136,12 +158,17 @@ export function HotelsList({ packages, onSelectHotel }: SourceGroupedResultsProp
   const [openHotel, setOpenHotel] = useState<HotelOffer | null>(null);
 
   const hotelGroups = useMemo(
-    () => groupUnique(packages, (pkg) => pkg.hotel.id, (pkg) => pkg.hotel.supplier),
-    [packages]
+    () =>
+      groupUnique(
+        packages,
+        (pkg) => pkg.hotel.id,
+        (pkg) => pkg.hotel.supplier,
+      ),
+    [packages],
   );
   const hotelCount = useMemo(
     () => [...hotelGroups.values()].reduce((sum, items) => sum + items.length, 0),
-    [hotelGroups]
+    [hotelGroups],
   );
 
   return (
@@ -163,7 +190,11 @@ export function HotelsList({ packages, onSelectHotel }: SourceGroupedResultsProp
             <div key={supplier} className="flex flex-col gap-3">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {items.map((pkg) => (
-                  <HotelSourceCard key={pkg.hotel.id} hotel={pkg.hotel} onSelect={() => setOpenHotel(pkg.hotel)} />
+                  <HotelSourceCard
+                    key={pkg.hotel.id}
+                    hotel={pkg.hotel}
+                    onSelect={() => setOpenHotel(pkg.hotel)}
+                  />
                 ))}
               </div>
             </div>
@@ -197,18 +228,24 @@ function HotelSourceCard({ hotel, onSelect }: { hotel: HotelOffer; onSelect: () 
         {hotel.image ? (
           <Image src={hotel.image} alt={hotel.name} fill sizes="240px" className="object-cover" />
         ) : (
-          <div className="flex h-full items-center justify-center text-xs text-ink-muted">{t.packageCard.noPhoto}</div>
+          <div className="flex h-full items-center justify-center text-xs text-ink-muted">
+            {t.packageCard.noPhoto}
+          </div>
         )}
       </div>
       <div className="flex flex-col gap-1.5 p-3.5">
         <p className="line-clamp-1 text-sm font-semibold text-ink">{hotel.name}</p>
-        <span className="flex items-center gap-0.5 text-gold-deep" aria-label={t.packageCard.starHotelAria(hotel.stars)}>
+        <span
+          className="flex items-center gap-0.5 text-gold-deep"
+          aria-label={t.packageCard.starHotelAria(hotel.stars)}
+        >
           {Array.from({ length: hotel.stars }).map((_, i) => (
             <Star key={i} className="size-3" weight="fill" aria-hidden />
           ))}
         </span>
         <span className="text-sm font-semibold text-ink">
-          {t.sourceGrouped.fromPrice} {formatAmount(cheapestRoom.price.amount, cheapestRoom.price.currency)}
+          {t.sourceGrouped.fromPrice}{" "}
+          {formatAmount(cheapestRoom.price.amount, cheapestRoom.price.currency)}
         </span>
       </div>
     </button>

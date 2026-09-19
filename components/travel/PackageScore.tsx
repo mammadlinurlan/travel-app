@@ -2,7 +2,7 @@
 
 import { Sparkle } from "@phosphor-icons/react/dist/ssr";
 import type { PackageScore as PackageScoreType, ScoreReason } from "@/domain/travel/types";
-import { useLocale, type Dictionary } from "@/lib/i18n/locale-context";
+import { type Dictionary, useLocale } from "@/lib/i18n/locale-context";
 
 interface PackageScoreProps {
   score: PackageScoreType;

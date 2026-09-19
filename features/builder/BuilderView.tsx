@@ -1,27 +1,41 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import {
   DndContext,
+  type DragEndEvent,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core";
-import { ArrowLeft, Airplane, Basket, Bed, Car, ListBullets, PaperPlaneTilt } from "@phosphor-icons/react/dist/ssr";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Airplane,
+  ArrowLeft,
+  Basket,
+  Bed,
+  Car,
+  ListBullets,
+  PaperPlaneTilt,
+} from "@phosphor-icons/react/dist/ssr";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { HotelDetailsSheet } from "@/components/travel/HotelDetailsSheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import type {
+  CustomizationRequest,
+  HotelOffer,
+  Room,
+  TravelPackage,
+  TripSearchResult,
+} from "@/domain/travel/types";
 import { OfferRequestForm } from "@/features/packages/OfferRequestForm";
 import { recalculatePackage } from "@/lib/api/client";
-import { formatAmount, formatDateRange, formatDateShort, formatTime } from "@/lib/utils/format";
 import { useLocale } from "@/lib/i18n/locale-context";
 import { cn } from "@/lib/utils";
-import type { CustomizationRequest, HotelOffer, Room, TravelPackage, TripSearchResult } from "@/domain/travel/types";
+import { formatAmount, formatDateRange, formatDateShort, formatTime } from "@/lib/utils/format";
+import { BuilderSlot } from "./BuilderSlot";
 import { deriveBuilderInventory, pickSeedPackage } from "./builder-inventory";
 import { InventoryPanel } from "./InventoryPanel";
-import { BuilderSlot } from "./BuilderSlot";
 import type { InventoryItemData } from "./types";
 
 interface BuilderViewProps {
@@ -36,10 +50,22 @@ interface BuilderViewProps {
 
 type MobileTab = "list" | "canvas";
 
-export function BuilderView({ searchResult, travelerCount, onBack, initialSelection, onOfferSent }: BuilderViewProps) {
+export function BuilderView({
+  searchResult,
+  travelerCount,
+  onBack,
+  initialSelection,
+  onOfferSent,
+}: BuilderViewProps) {
   const { t, locale } = useLocale();
-  const inventory = useMemo(() => deriveBuilderInventory(searchResult.packages), [searchResult.packages]);
-  const seedPackage = useMemo(() => pickSeedPackage(searchResult.packages), [searchResult.packages]);
+  const inventory = useMemo(
+    () => deriveBuilderInventory(searchResult.packages),
+    [searchResult.packages],
+  );
+  const seedPackage = useMemo(
+    () => pickSeedPackage(searchResult.packages),
+    [searchResult.packages],
+  );
 
   const [selectedFlightId, setSelectedFlightId] = useState<string | null>(null);
   const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
@@ -51,7 +77,7 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
   );
 
   // Price is only ever what the server returns from the same, already-tested
@@ -131,16 +157,19 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
     const overType = event.over?.data.current?.type as InventoryItemData["type"] | undefined;
     const activeData = event.active.data.current as InventoryItemData | undefined;
     if (!overType || !activeData) return;
-    const matches = activeData.type === overType || (activeData.type === "hotel-picker" && overType === "hotel");
+    const matches =
+      activeData.type === overType || (activeData.type === "hotel-picker" && overType === "hotel");
     if (!matches) return;
     applySelection(activeData);
   }
 
   const selectedFlight = inventory.flights.find((f) => f.flight.id === selectedFlightId)?.flight;
   const selectedHotelRoom = inventory.hotelRooms.find(
-    (h) => h.hotel.id === selectedHotelId && h.room.id === selectedRoomId
+    (h) => h.hotel.id === selectedHotelId && h.room.id === selectedRoomId,
   );
-  const selectedTransfer = inventory.transfers.find((tr) => tr.transfer.id === selectedTransferId)?.transfer;
+  const selectedTransfer = inventory.transfers.find(
+    (tr) => tr.transfer.id === selectedTransferId,
+  )?.transfer;
 
   const draft = recalc.data;
   const total = draft && recalc.isSuccess ? draft.price.total : null;
@@ -148,7 +177,7 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
   const tripSummary = `${searchResult.request.destination} · ${formatDateRange(
     searchResult.request.departureDate,
     searchResult.request.returnDate,
-    locale
+    locale,
   )} · ${t.search.traveler(travelerCount)}`;
 
   return (
@@ -159,7 +188,11 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
           onClick={onBack}
           className="group flex w-fit items-center gap-1.5 rounded-lg text-sm font-medium text-ink-muted transition-colors hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
         >
-          <ArrowLeft className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" weight="bold" aria-hidden />
+          <ArrowLeft
+            className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5"
+            weight="bold"
+            aria-hidden
+          />
           {t.builder.back}
         </button>
 
@@ -177,7 +210,7 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
             onClick={() => setMobileTab("list")}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-semibold transition-all",
-              mobileTab === "list" ? "bg-navy text-ivory shadow-sm" : "text-ink-muted"
+              mobileTab === "list" ? "bg-navy text-ivory shadow-sm" : "text-ink-muted",
             )}
           >
             <ListBullets className="size-3.5" weight="bold" aria-hidden />
@@ -188,7 +221,7 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
             onClick={() => setMobileTab("canvas")}
             className={cn(
               "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-semibold transition-all",
-              mobileTab === "canvas" ? "bg-navy text-ivory shadow-sm" : "text-ink-muted"
+              mobileTab === "canvas" ? "bg-navy text-ivory shadow-sm" : "text-ink-muted",
             )}
           >
             <Basket className="size-3.5" weight="bold" aria-hidden />
@@ -202,7 +235,12 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
         </div>
 
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
-          <aside className={cn("w-full shrink-0 lg:block lg:w-80", mobileTab === "list" ? "block" : "hidden lg:block")}>
+          <aside
+            className={cn(
+              "w-full shrink-0 lg:block lg:w-80",
+              mobileTab === "list" ? "block" : "hidden lg:block",
+            )}
+          >
             <div className="flex max-h-[65vh] flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-panel lg:sticky lg:top-32 lg:max-h-[calc(100vh-9rem)]">
               <InventoryPanel
                 inventory={inventory}
@@ -215,7 +253,9 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
             </div>
           </aside>
 
-          <div className={cn("min-w-0 flex-1", mobileTab === "canvas" ? "block" : "hidden lg:block")}>
+          <div
+            className={cn("min-w-0 flex-1", mobileTab === "canvas" ? "block" : "hidden lg:block")}
+          >
             <div className="flex flex-col rounded-2xl border border-border bg-white p-4 shadow-panel sm:p-5">
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -224,7 +264,9 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
                 </div>
                 {total !== null && (
                   <div className="shrink-0 rounded-xl bg-sand px-3 py-2 text-right">
-                    <p className="text-[9px] font-semibold uppercase tracking-wider text-ink-muted">{t.builder.total}</p>
+                    <p className="text-[9px] font-semibold uppercase tracking-wider text-ink-muted">
+                      {t.builder.total}
+                    </p>
                     <p className="text-lg font-extrabold leading-tight text-ink">
                       {formatAmount(total, draft!.price.currency)}
                     </p>
@@ -232,15 +274,27 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
                 )}
               </div>
 
-              {!canPrice && <p className="mb-3 text-xs text-ink-muted">{t.builder.summaryPending}</p>}
-              {canPrice && recalc.isPending && <p className="mb-3 text-xs text-ink-muted">{t.builder.summaryCalculating}</p>}
-              {canPrice && recalc.isError && <p className="mb-3 text-xs text-error">{t.builder.summaryError}</p>}
+              {!canPrice && (
+                <p className="mb-3 text-xs text-ink-muted">{t.builder.summaryPending}</p>
+              )}
+              {canPrice && recalc.isPending && (
+                <p className="mb-3 text-xs text-ink-muted">{t.builder.summaryCalculating}</p>
+              )}
+              {canPrice && recalc.isError && (
+                <p className="mb-3 text-xs text-error">{t.builder.summaryError}</p>
+              )}
 
               <div className="flex flex-col gap-3">
                 <BuilderSlot
                   slotType="flight"
                   label={t.builder.slotFlight}
-                  icon={<Airplane className="size-4" weight={selectedFlight ? "fill" : "regular"} aria-hidden />}
+                  icon={
+                    <Airplane
+                      className="size-4"
+                      weight={selectedFlight ? "fill" : "regular"}
+                      aria-hidden
+                    />
+                  }
                   filled={Boolean(selectedFlight)}
                   title={
                     selectedFlight &&
@@ -250,35 +304,56 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
                     selectedFlight &&
                     `${formatDateShort(selectedFlight.outbound[0].departureTime, locale)}, ${formatTime(
                       selectedFlight.outbound[0].departureTime,
-                      locale
+                      locale,
                     )} — ${formatTime(
                       selectedFlight.outbound[selectedFlight.outbound.length - 1].arrivalTime,
-                      locale
+                      locale,
                     )}`
                   }
-                  price={selectedFlight && formatAmount(selectedFlight.price.amount, selectedFlight.price.currency)}
+                  price={
+                    selectedFlight &&
+                    formatAmount(selectedFlight.price.amount, selectedFlight.price.currency)
+                  }
                 />
 
                 <BuilderSlot
                   slotType="hotel"
                   label={t.builder.slotHotel}
-                  icon={<Bed className="size-4" weight={selectedHotelRoom ? "fill" : "regular"} aria-hidden />}
+                  icon={
+                    <Bed
+                      className="size-4"
+                      weight={selectedHotelRoom ? "fill" : "regular"}
+                      aria-hidden
+                    />
+                  }
                   filled={Boolean(selectedHotelRoom)}
                   title={selectedHotelRoom?.hotel.name}
                   detail={selectedHotelRoom?.room.name}
                   price={
                     selectedHotelRoom &&
-                    formatAmount(selectedHotelRoom.room.price.amount, selectedHotelRoom.room.price.currency)
+                    formatAmount(
+                      selectedHotelRoom.room.price.amount,
+                      selectedHotelRoom.room.price.currency,
+                    )
                   }
                 />
 
                 <BuilderSlot
                   slotType="transfer"
                   label={t.builder.slotTransfer}
-                  icon={<Car className="size-4" weight={selectedTransfer ? "fill" : "regular"} aria-hidden />}
+                  icon={
+                    <Car
+                      className="size-4"
+                      weight={selectedTransfer ? "fill" : "regular"}
+                      aria-hidden
+                    />
+                  }
                   filled={Boolean(selectedTransfer)}
                   title={selectedTransfer?.vehicle}
-                  price={selectedTransfer && formatAmount(selectedTransfer.price.amount, selectedTransfer.price.currency)}
+                  price={
+                    selectedTransfer &&
+                    formatAmount(selectedTransfer.price.amount, selectedTransfer.price.currency)
+                  }
                   onClear={selectedTransfer ? clearTransfer : undefined}
                 />
               </div>
@@ -291,8 +366,12 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
       <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-border bg-white px-4 py-3 sm:px-6 lg:px-8">
         {total !== null ? (
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[10px] font-medium text-ink-muted">{t.builder.selectedProgress(filledCount, 3)}</p>
-            <p className="text-lg font-extrabold leading-none text-ink">{formatAmount(total, draft!.price.currency)}</p>
+            <p className="truncate text-[10px] font-medium text-ink-muted">
+              {t.builder.selectedProgress(filledCount, 3)}
+            </p>
+            <p className="text-lg font-extrabold leading-none text-ink">
+              {formatAmount(total, draft!.price.currency)}
+            </p>
           </div>
         ) : (
           <p className="flex-1 text-xs text-ink-muted">{t.builder.completePrompt}</p>
@@ -303,7 +382,9 @@ export function BuilderView({ searchResult, travelerCount, onBack, initialSelect
           onClick={() => setOfferFormOpen(true)}
           className={cn(
             "flex shrink-0 items-center gap-2 rounded-xl px-5 py-3 text-xs font-bold transition-colors",
-            canPrice ? "bg-gold text-ivory hover:bg-gold-deep" : "cursor-not-allowed bg-sand text-ink-muted/50"
+            canPrice
+              ? "bg-gold text-ivory hover:bg-gold-deep"
+              : "cursor-not-allowed bg-sand text-ink-muted/50",
           )}
         >
           <PaperPlaneTilt className="size-3.5" weight="fill" aria-hidden />

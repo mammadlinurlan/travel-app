@@ -17,7 +17,7 @@ export class RateHawkHotelProvider implements HotelProvider {
 
   async searchHotels(): Promise<HotelOffer[]> {
     throw new Error(
-      "RateHawkHotelProvider is not implemented — official API docs/credentials were not available at build time. Use TRAVEL_PROVIDER_MODE=mock."
+      "RateHawkHotelProvider is not implemented — official API docs/credentials were not available at build time. Use TRAVEL_PROVIDER_MODE=mock.",
     );
   }
 }

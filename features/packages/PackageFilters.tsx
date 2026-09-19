@@ -1,9 +1,9 @@
 "use client";
 
 import { Star } from "@phosphor-icons/react/dist/ssr";
-import { cn } from "@/lib/utils";
-import { useLocale } from "@/lib/i18n/locale-context";
 import type { CabinClass, MealPlan } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { cn } from "@/lib/utils";
 
 export type SortMode = "recommended" | "cheapest" | "best_hotel" | "shortest_flight";
 
@@ -76,7 +76,9 @@ export function PackageFilters({
   const { t } = useLocale();
 
   function toggleStar(value: number) {
-    onStarsChange(stars.includes(value) ? stars.filter((s) => s !== value) : [...stars, value].sort());
+    onStarsChange(
+      stars.includes(value) ? stars.filter((s) => s !== value) : [...stars, value].sort(),
+    );
   }
 
   // An empty selection means "all airlines". Expand it before toggling so that
@@ -103,7 +105,8 @@ export function PackageFilters({
     const parsed = raw === "" ? fallback : Number(raw);
     if (Number.isNaN(parsed)) return;
     const clamped = Math.min(Math.max(parsed, priceBounds.min), priceBounds.max);
-    const next: [number, number] = index === 0 ? [clamped, priceRange[1]] : [priceRange[0], clamped];
+    const next: [number, number] =
+      index === 0 ? [clamped, priceRange[1]] : [priceRange[0], clamped];
     if (next[0] > next[1]) return;
     onPriceRangeChange(next);
   }
@@ -111,7 +114,9 @@ export function PackageFilters({
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between pb-4">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">{t.filters.title}</h2>
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
+          {t.filters.title}
+        </h2>
         {hasActiveFilters && (
           <button
             type="button"
@@ -137,7 +142,7 @@ export function PackageFilters({
                   "flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40",
                   active
                     ? "border-navy bg-navy text-white"
-                    : "border-border bg-white text-ink hover:border-navy/30 hover:bg-sand"
+                    : "border-border bg-white text-ink hover:border-navy/30 hover:bg-sand",
                 )}
               >
                 {value}
@@ -160,7 +165,7 @@ export function PackageFilters({
                 "rounded-lg border px-2.5 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40",
                 minRating === value
                   ? "border-navy bg-navy text-white"
-                  : "border-border bg-white text-ink hover:border-navy/30 hover:bg-sand"
+                  : "border-border bg-white text-ink hover:border-navy/30 hover:bg-sand",
               )}
             >
               {value === 0 ? t.filters.any : `${value}+`}
@@ -177,7 +182,7 @@ export function PackageFilters({
               key={option}
               className={cn(
                 "flex cursor-pointer items-center gap-2.5 text-sm text-ink transition-opacity",
-                isRefetching && "opacity-50"
+                isRefetching && "opacity-50",
               )}
             >
               <input
@@ -213,7 +218,10 @@ export function PackageFilters({
           <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
             <span className="text-xs font-medium text-ink-muted">{t.filters.airlines}</span>
             {airlines.map((airline) => (
-              <label key={airline} className="flex cursor-pointer items-center gap-2.5 text-sm text-ink">
+              <label
+                key={airline}
+                className="flex cursor-pointer items-center gap-2.5 text-sm text-ink"
+              >
                 <input
                   type="checkbox"
                   checked={selectedAirlines.length === 0 || selectedAirlines.includes(airline)}
@@ -231,7 +239,10 @@ export function PackageFilters({
         <Section label={t.filters.mealPlan}>
           <div className="flex flex-col gap-2">
             {mealPlans.map((mealPlan) => (
-              <label key={mealPlan} className="flex cursor-pointer items-center gap-2.5 text-sm text-ink">
+              <label
+                key={mealPlan}
+                className="flex cursor-pointer items-center gap-2.5 text-sm text-ink"
+              >
                 <input
                   type="checkbox"
                   checked={selectedMealPlans.length === 0 || selectedMealPlans.includes(mealPlan)}
@@ -302,7 +313,9 @@ function Section({
 }) {
   return (
     <section className={cn("border-t border-border py-4", last && "pb-0")}>
-      <h3 className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-muted">{label}</h3>
+      <h3 className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-muted">
+        {label}
+      </h3>
       {children}
     </section>
   );
@@ -337,7 +350,7 @@ function PriceInput({
         className={cn(
           "w-full rounded-lg border border-border bg-white py-2 pr-2 text-sm text-ink transition-colors",
           "focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20",
-          currency === "USD" ? "pl-5" : "pl-2.5"
+          currency === "USD" ? "pl-5" : "pl-2.5",
         )}
       />
     </label>

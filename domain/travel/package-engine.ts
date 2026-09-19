@@ -101,7 +101,10 @@ function compatibleRooms(hotel: HotelOffer, request: TripSearchRequest): Room[] 
     .slice(0, MAX_ROOMS_PER_HOTEL);
 }
 
-function selectTransferOptions(transfers: TransferOffer[], request: TripSearchRequest): (TransferOffer | null)[] {
+function selectTransferOptions(
+  transfers: TransferOffer[],
+  request: TripSearchRequest,
+): (TransferOffer | null)[] {
   const count = travelerCount(request);
   const capacityMatched = transfers.filter((t) => t.maxPassengers >= count);
 

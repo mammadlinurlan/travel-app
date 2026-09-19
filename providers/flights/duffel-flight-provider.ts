@@ -25,8 +25,16 @@ export class DuffelFlightProvider implements FlightProvider {
     const payload = {
       data: {
         slices: [
-          { origin: request.origin, destination: request.destination, departure_date: request.departureDate },
-          { origin: request.destination, destination: request.origin, departure_date: request.returnDate },
+          {
+            origin: request.origin,
+            destination: request.destination,
+            departure_date: request.departureDate,
+          },
+          {
+            origin: request.destination,
+            destination: request.origin,
+            departure_date: request.returnDate,
+          },
         ],
         passengers: [
           ...Array(request.travelers.adults).fill({ type: "adult" }),
@@ -55,7 +63,9 @@ export class DuffelFlightProvider implements FlightProvider {
 
     const json = await response.json();
     const offers = json?.data?.offers ?? [];
-    return offers.map(mapDuffelOffer).filter((offer: FlightOffer | null): offer is FlightOffer => offer !== null);
+    return offers
+      .map(mapDuffelOffer)
+      .filter((offer: FlightOffer | null): offer is FlightOffer => offer !== null);
   }
 }
 
@@ -73,9 +83,17 @@ function mapDuffelOffer(raw: Record<string, unknown>): FlightOffer | null {
       stops: Math.max(outbound.length - 1, 0),
       totalDurationMinutes: legDurationMinutes(outbound) + legDurationMinutes(inbound),
       baggage: { checked: 1, cabin: 1 },
-      price: { amount: Number(raw.total_amount), currency: (raw.total_currency as FlightOffer["price"]["currency"]) ?? "USD" },
-      fareBrand: String((raw.slices as Array<Record<string, unknown>>)?.[0]?.fare_brand_name ?? "Standard"),
-      refundable: Boolean((raw as { conditions?: { refund_before_departure?: unknown } }).conditions?.refund_before_departure),
+      price: {
+        amount: Number(raw.total_amount),
+        currency: (raw.total_currency as FlightOffer["price"]["currency"]) ?? "USD",
+      },
+      fareBrand: String(
+        (raw.slices as Array<Record<string, unknown>>)?.[0]?.fare_brand_name ?? "Standard",
+      ),
+      refundable: Boolean(
+        (raw as { conditions?: { refund_before_departure?: unknown } }).conditions
+          ?.refund_before_departure,
+      ),
       supplier: "duffel",
     };
   } catch {
@@ -109,7 +127,9 @@ function mapSegments(slice: Record<string, unknown>): FlightSegment[] {
       departureTime: String(segment.departing_at),
       arrivalTime: String(segment.arriving_at),
       durationMinutes: parseIsoDurationMinutes(String(segment.duration ?? "PT0M")),
-      cabin: (segment.passengers as Array<{ cabin_class?: string }>)?.[0]?.cabin_class as FlightSegment["cabin"] ?? "economy",
+      cabin:
+        ((segment.passengers as Array<{ cabin_class?: string }>)?.[0]
+          ?.cabin_class as FlightSegment["cabin"]) ?? "economy",
     };
   });
 }
@@ -119,7 +139,9 @@ function legDurationMinutes(segments: FlightSegment[]): number {
   if (segments.length === 0) return 0;
   const first = segments[0];
   const last = segments[segments.length - 1];
-  return Math.round((new Date(last.arrivalTime).getTime() - new Date(first.departureTime).getTime()) / 60000);
+  return Math.round(
+    (new Date(last.arrivalTime).getTime() - new Date(first.departureTime).getTime()) / 60000,
+  );
 }
 
 function parseIsoDurationMinutes(iso: string): number {

@@ -1,5 +1,11 @@
 import { SCORING_WEIGHTS } from "@/lib/config/scoring-config";
-import type { PackageCategory, PackageScore, ScoreReason, TravelPackage, TripSearchRequest } from "./types";
+import type {
+  PackageCategory,
+  PackageScore,
+  ScoreReason,
+  TravelPackage,
+  TripSearchRequest,
+} from "./types";
 
 interface PriceRange {
   min: number;
@@ -55,7 +61,7 @@ function scorePreferenceMatch(pkg: TravelPackage, request: TripSearchRequest): n
 export function scorePackage(
   pkg: TravelPackage,
   request: TripSearchRequest,
-  priceRange: PriceRange
+  priceRange: PriceRange,
 ): PackageScore {
   const breakdown = {
     price: scorePrice(pkg.price.total, priceRange),
@@ -72,7 +78,7 @@ export function scorePackage(
       breakdown.flightQuality * SCORING_WEIGHTS.flightQuality +
       breakdown.location * SCORING_WEIGHTS.location +
       breakdown.includedServices * SCORING_WEIGHTS.includedServices +
-      breakdown.preferenceMatch * SCORING_WEIGHTS.preferenceMatch
+      breakdown.preferenceMatch * SCORING_WEIGHTS.preferenceMatch,
   );
 
   return {
@@ -86,16 +92,19 @@ export function scorePackage(
 function buildReasons(
   pkg: TravelPackage,
   breakdown: PackageScore["breakdown"],
-  request: TripSearchRequest
+  request: TripSearchRequest,
 ): ScoreReason[] {
   const reasons: ScoreReason[] = [];
-  if (pkg.hotel.stars >= 4) reasons.push({ key: "topHotel", hotelStars: pkg.hotel.stars, hotelName: pkg.hotel.name });
+  if (pkg.hotel.stars >= 4)
+    reasons.push({ key: "topHotel", hotelStars: pkg.hotel.stars, hotelName: pkg.hotel.name });
   if (breakdown.location >= 80) reasons.push({ key: "closeToBeach" });
   if (pkg.flight.stops === 0) reasons.push({ key: "directFlight" });
-  if (pkg.room.mealPlan !== "room_only") reasons.push({ key: "mealPlan", mealPlan: pkg.room.mealPlan });
+  if (pkg.room.mealPlan !== "room_only")
+    reasons.push({ key: "mealPlan", mealPlan: pkg.room.mealPlan });
   if (pkg.transfer) reasons.push({ key: "transferIncluded" });
   if (breakdown.price >= 80) reasons.push({ key: "greatPrice" });
-  if (request.preferences.hotelStars.includes(pkg.hotel.stars)) reasons.push({ key: "matchesStarPreference" });
+  if (request.preferences.hotelStars.includes(pkg.hotel.stars))
+    reasons.push({ key: "matchesStarPreference" });
   return reasons.slice(0, 4);
 }
 
@@ -125,7 +134,12 @@ export function categorizePackages(packages: TravelPackage[]): TravelPackage[] {
       return { ...pkg, score: { ...pkg.score, category } };
     })
     .sort((a, b) => {
-      const order: Record<PackageCategory, number> = { cheapest: 0, best_value: 1, premium: 2, alternative: 3 };
+      const order: Record<PackageCategory, number> = {
+        cheapest: 0,
+        best_value: 1,
+        premium: 2,
+        alternative: 3,
+      };
       if (order[a.score.category] !== order[b.score.category]) {
         return order[a.score.category] - order[b.score.category];
       }

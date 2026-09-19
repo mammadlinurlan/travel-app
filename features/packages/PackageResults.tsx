@@ -1,16 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import { WarningCircle } from "@phosphor-icons/react/dist/ssr";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useMemo, useState } from "react";
 import { PackageCard } from "@/components/travel/PackageCard";
-import { PackageFilters, type SortMode } from "./PackageFilters";
-import { ResultsToolbar, type ResultsViewMode } from "./ResultsToolbar";
-import { ResultsTopBar } from "./ResultsTopBar";
-import { FlightsList, HotelsList } from "./SourceGroupedResults";
-import { PackagesOfferView } from "./PackagesOfferView";
-import { formatDateRange } from "@/lib/utils/format";
-import { useLocale } from "@/lib/i18n/locale-context";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type {
   CabinClass,
   FlightOffer,
@@ -20,6 +13,13 @@ import type {
   TravelPackage,
   TripSearchRequest,
 } from "@/domain/travel/types";
+import { useLocale } from "@/lib/i18n/locale-context";
+import { formatDateRange } from "@/lib/utils/format";
+import { PackageFilters, type SortMode } from "./PackageFilters";
+import { PackagesOfferView } from "./PackagesOfferView";
+import { ResultsToolbar, type ResultsViewMode } from "./ResultsToolbar";
+import { ResultsTopBar } from "./ResultsTopBar";
+import { FlightsList, HotelsList } from "./SourceGroupedResults";
 
 /** Results shown per page; "Load more" reveals the next batch. */
 const PAGE_SIZE = 9;
@@ -72,13 +72,16 @@ export function PackageResults({
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   const airlines = useMemo(
-    () => [...new Set(packages.map((pkg) => pkg.flight.outbound[0].airline))].sort((a, b) => a.localeCompare(b)),
-    [packages]
+    () =>
+      [...new Set(packages.map((pkg) => pkg.flight.outbound[0].airline))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [packages],
   );
 
   const mealPlans = useMemo(
     () => [...new Set(packages.map((pkg) => pkg.room.mealPlan))],
-    [packages]
+    [packages],
   );
 
   const priceBounds = useMemo(() => {
@@ -87,7 +90,10 @@ export function PackageResults({
     return { min: Math.floor(Math.min(...totals)), max: Math.ceil(Math.max(...totals)) };
   }, [packages]);
 
-  const [priceRange, setPriceRange] = useState<[number, number]>([priceBounds.min, priceBounds.max]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    priceBounds.min,
+    priceBounds.max,
+  ]);
   const [boundsSignature, setBoundsSignature] = useState(`${priceBounds.min}:${priceBounds.max}`);
 
   // Re-seed the price range when a new result set arrives (e.g. after switching
@@ -139,7 +145,7 @@ export function PackageResults({
       result = result.filter((pkg) => pkg.hotel.name.toLowerCase().includes(query));
     }
     result = result.filter(
-      (pkg) => pkg.price.total >= priceRange[0] && pkg.price.total <= priceRange[1]
+      (pkg) => pkg.price.total >= priceRange[0] && pkg.price.total <= priceRange[1],
     );
 
     const copy = [...result];
@@ -147,7 +153,9 @@ export function PackageResults({
       case "cheapest":
         return copy.sort((a, b) => a.price.total - b.price.total);
       case "best_hotel":
-        return copy.sort((a, b) => b.hotel.stars - a.hotel.stars || b.hotel.rating - a.hotel.rating);
+        return copy.sort(
+          (a, b) => b.hotel.stars - a.hotel.stars || b.hotel.rating - a.hotel.rating,
+        );
       case "shortest_flight":
         return copy.sort((a, b) => a.flight.totalDurationMinutes - b.flight.totalDurationMinutes);
       default:
@@ -184,7 +192,8 @@ export function PackageResults({
   // on their own, since many packages can share the same flight/hotel.
   const flightCount = useMemo(() => new Set(filtered.map((pkg) => pkg.flight.id)).size, [filtered]);
   const hotelCount = useMemo(() => new Set(filtered.map((pkg) => pkg.hotel.id)).size, [filtered]);
-  const activeResultCount = viewMode === "flights" ? flightCount : viewMode === "hotels" ? hotelCount : filtered.length;
+  const activeResultCount =
+    viewMode === "flights" ? flightCount : viewMode === "hotels" ? hotelCount : filtered.length;
 
   const filterPanel = (
     <PackageFilters
@@ -219,7 +228,7 @@ export function PackageResults({
   const tripSummary = `${request.destination} · ${formatDateRange(
     request.departureDate,
     request.returnDate,
-    locale
+    locale,
   )} · ${t.search.traveler(travelerCount)}`;
 
   return (
@@ -247,94 +256,106 @@ export function PackageResults({
         />
       ) : (
         <>
-      <ResultsToolbar
-        resultCount={activeResultCount}
-        sortMode={sortMode}
-        onSortModeChange={setSortMode}
-        onNewSearch={onNewSearch}
-        onOpenFilters={() => setFiltersOpen(true)}
-        activeFilterCount={activeFilterCount}
-        hotelQuery={hotelQuery}
-        onHotelQueryChange={setHotelQuery}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+          <ResultsToolbar
+            resultCount={activeResultCount}
+            sortMode={sortMode}
+            onSortModeChange={setSortMode}
+            onNewSearch={onNewSearch}
+            onOpenFilters={() => setFiltersOpen(true)}
+            activeFilterCount={activeFilterCount}
+            hotelQuery={hotelQuery}
+            onHotelQueryChange={setHotelQuery}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
 
-      {warnings.length > 0 && (
-        <div className="mt-6 flex flex-col gap-1.5 rounded-xl border border-gold/50 bg-gold/15 px-4 py-3">
-          {warnings.map((warning) => (
-            <p key={warning} className="flex items-start gap-2 text-sm text-ink">
-              <WarningCircle className="mt-0.5 size-4 shrink-0 text-gold-deep" weight="fill" aria-hidden />
-              {t.warnings[warning as keyof typeof t.warnings] ?? warning}
-            </p>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-8 flex gap-8">
-        <aside className="hidden w-[248px] shrink-0 lg:block">
-          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-border bg-white p-5 shadow-panel">
-            {filterPanel}
-          </div>
-        </aside>
-
-        <div className="min-w-0 flex-1">
-          {packages.length === 0 ? (
-            <EmptyState
-              title={t.results.noTripTitle}
-              body={
-                warnings[0]
-                  ? (t.warnings[warnings[0] as keyof typeof t.warnings] ?? warnings[0])
-                  : t.results.tryAdjusting
-              }
-            />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              title={t.results.noMatchTitle}
-              body={t.results.noMatchBody}
-              action={
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-4 rounded-lg bg-navy px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-navy-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
-                >
-                  {t.results.clearFilters}
-                </button>
-              }
-            />
-          ) : viewMode === "flights" ? (
-            <FlightsList packages={filtered} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
-          ) : viewMode === "hotels" ? (
-            <HotelsList packages={filtered} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
-          ) : (
-            <>
-              <div className="card-stagger grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {visible.map((pkg, index) => (
-                  <PackageCard
-                    key={pkg.id}
-                    pkg={pkg}
-                    travelerCount={travelerCount}
-                    onView={onSelect}
-                    index={index}
+          {warnings.length > 0 && (
+            <div className="mt-6 flex flex-col gap-1.5 rounded-xl border border-gold/50 bg-gold/15 px-4 py-3">
+              {warnings.map((warning) => (
+                <p key={warning} className="flex items-start gap-2 text-sm text-ink">
+                  <WarningCircle
+                    className="mt-0.5 size-4 shrink-0 text-gold-deep"
+                    weight="fill"
+                    aria-hidden
                   />
-                ))}
-              </div>
-
-              {hasMore && (
-                <div className="mt-8 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
-                    className="rounded-lg border border-border bg-white px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:border-navy/30 hover:bg-sand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40"
-                  >
-                    {t.results.loadMore(filtered.length - visible.length)}
-                  </button>
-                </div>
-              )}
-            </>
+                  {t.warnings[warning as keyof typeof t.warnings] ?? warning}
+                </p>
+              ))}
+            </div>
           )}
-        </div>
-      </div>
+
+          <div className="mt-8 flex gap-8">
+            <aside className="hidden w-[248px] shrink-0 lg:block">
+              <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-border bg-white p-5 shadow-panel">
+                {filterPanel}
+              </div>
+            </aside>
+
+            <div className="min-w-0 flex-1">
+              {packages.length === 0 ? (
+                <EmptyState
+                  title={t.results.noTripTitle}
+                  body={
+                    warnings[0]
+                      ? (t.warnings[warnings[0] as keyof typeof t.warnings] ?? warnings[0])
+                      : t.results.tryAdjusting
+                  }
+                />
+              ) : filtered.length === 0 ? (
+                <EmptyState
+                  title={t.results.noMatchTitle}
+                  body={t.results.noMatchBody}
+                  action={
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="mt-4 rounded-lg bg-navy px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-navy-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
+                    >
+                      {t.results.clearFilters}
+                    </button>
+                  }
+                />
+              ) : viewMode === "flights" ? (
+                <FlightsList
+                  packages={filtered}
+                  onSelectFlight={onSelectFlight}
+                  onSelectHotel={onSelectHotel}
+                />
+              ) : viewMode === "hotels" ? (
+                <HotelsList
+                  packages={filtered}
+                  onSelectFlight={onSelectFlight}
+                  onSelectHotel={onSelectHotel}
+                />
+              ) : (
+                <>
+                  <div className="card-stagger grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                    {visible.map((pkg, index) => (
+                      <PackageCard
+                        key={pkg.id}
+                        pkg={pkg}
+                        travelerCount={travelerCount}
+                        onView={onSelect}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+
+                  {hasMore && (
+                    <div className="mt-8 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+                        className="rounded-lg border border-border bg-white px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:border-navy/30 hover:bg-sand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40"
+                      >
+                        {t.results.loadMore(filtered.length - visible.length)}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         </>
       )}
 
@@ -344,7 +365,9 @@ export function PackageResults({
           className="gap-0 overflow-y-auto p-0 data-[side=left]:w-full data-[side=left]:sm:max-w-sm"
         >
           <SheetHeader className="border-b border-border px-5 py-4">
-            <SheetTitle className="text-base font-semibold text-ink">{t.results.filtersTitle}</SheetTitle>
+            <SheetTitle className="text-base font-semibold text-ink">
+              {t.results.filtersTitle}
+            </SheetTitle>
           </SheetHeader>
 
           <div className="px-5 pb-28 pt-2">{filterPanel}</div>

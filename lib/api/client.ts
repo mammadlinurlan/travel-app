@@ -37,7 +37,7 @@ export async function getPackage(packageId: string): Promise<TravelPackage> {
 
 export async function recalculatePackage(
   packageId: string,
-  customization: CustomizationRequest
+  customization: CustomizationRequest,
 ): Promise<TravelPackage> {
   const response = await fetch(`/api/packages/${packageId}/recalculate`, {
     method: "POST",
@@ -84,7 +84,9 @@ export interface VoiceTripParsePayload {
   mimeType: string;
 }
 
-export async function parseTripIntentFromVoice(payload: VoiceTripParsePayload): Promise<ParsedTripIntent> {
+export async function parseTripIntentFromVoice(
+  payload: VoiceTripParsePayload,
+): Promise<ParsedTripIntent> {
   const response = await fetch("/api/ai/parse-trip-voice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

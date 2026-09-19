@@ -34,10 +34,14 @@ export class MockHotelProvider implements HotelProvider {
 
       const rooms: Room[] = availableMealPlans.map((mealPlan, mealIndex) => {
         const jitter = range(rng, 0.95, 1.05);
-        const nightly = hotel.nightlyPriceUsd * MEAL_MULTIPLIER[mealPlan] * occupancyFactor * jitter;
+        const nightly =
+          hotel.nightlyPriceUsd * MEAL_MULTIPLIER[mealPlan] * occupancyFactor * jitter;
         return {
           id: `room-${profile.code}-${hotelIndex}-${mealIndex}`,
-          name: mealPlan === "room_only" ? "Deluxe Room" : "Deluxe Room with " + mealPlanLabel(mealPlan),
+          name:
+            mealPlan === "room_only"
+              ? "Deluxe Room"
+              : "Deluxe Room with " + mealPlanLabel(mealPlan),
           mealPlan,
           maxOccupancy: Math.max(2, Math.min(4, occupants)),
           refundable: mealPlan !== "all_inclusive",

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { tripSearchSchema } from "@/domain/travel/validation";
 import { runTripSearch } from "@/lib/server/search-service";
 
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Invalid search request.", issues: parsed.error.issues },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -23,6 +23,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error("Trip search failed", error);
-    return NextResponse.json({ error: "We couldn't complete this search. Please try again." }, { status: 502 });
+    return NextResponse.json(
+      { error: "We couldn't complete this search. Please try again." },
+      { status: 502 },
+    );
   }
 }
