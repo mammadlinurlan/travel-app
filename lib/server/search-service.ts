@@ -34,20 +34,20 @@ export async function runTripSearch(request: TripSearchRequest): Promise<TripSea
   console.log("[search] flights from API:", JSON.stringify(flights.slice(0, 10), null, 2));
   if (flightsResult.status === "rejected") {
     console.error("Flight search failed", flightsResult.reason);
-    warnings.push("Flights are temporarily unavailable. Try again shortly.");
+    warnings.push("flights_unavailable");
   }
 
   const hotels = hotelsResult.status === "fulfilled" ? hotelsResult.value : [];
   console.log("[search] hotels from API:", JSON.stringify(hotels.slice(0, 10), null, 2));
   if (hotelsResult.status === "rejected") {
     console.error("Hotel search failed", hotelsResult.reason);
-    warnings.push("Hotels are temporarily unavailable. Try again shortly.");
+    warnings.push("hotels_unavailable");
   }
 
   const transfers = transfersResult.status === "fulfilled" ? transfersResult.value : [];
   if (transfersResult.status === "rejected") {
     console.error("Transfer search failed", transfersResult.reason);
-    warnings.push("We couldn't find live transfer options. You can continue without a transfer.");
+    warnings.push("transfer_unavailable");
   }
 
   const engineResult = generatePackages({ request, flights, hotels, transfers });

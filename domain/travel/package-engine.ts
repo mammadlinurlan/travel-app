@@ -116,8 +116,8 @@ export function generatePackages(input: PackageEngineInput): PackageEngineResult
   const { request, flights, hotels, transfers } = input;
   const warnings: string[] = [];
 
-  if (flights.length === 0) warnings.push("We couldn't find live flight options for this route.");
-  if (hotels.length === 0) warnings.push("We couldn't find hotel availability for these dates.");
+  if (flights.length === 0) warnings.push("no_flights_route");
+  if (hotels.length === 0) warnings.push("no_hotels_dates");
 
   const flightsToUse = diverseFlights(flights);
 
@@ -125,12 +125,12 @@ export function generatePackages(input: PackageEngineInput): PackageEngineResult
   let hotelsToUse = preferredHotels;
   if (hotelsToUse.length === 0 && hotels.length > 0) {
     hotelsToUse = hotels;
-    warnings.push("No hotels matched your star preference exactly — showing the closest options.");
+    warnings.push("hotel_star_mismatch");
   }
 
   const transferOptions = selectTransferOptions(transfers, request);
   if (request.preferences.transferRequired && transferOptions.every((t) => t === null)) {
-    warnings.push("We couldn't find live transfer options. You can continue without a transfer.");
+    warnings.push("transfer_unavailable");
   }
 
   const raw: TravelPackage[] = [];
@@ -174,7 +174,7 @@ export function generatePackages(input: PackageEngineInput): PackageEngineResult
   }
 
   if (raw.length === 0) {
-    return { packages: [], warnings: [...warnings, "We couldn't build a complete trip from the available inventory."] };
+    return { packages: [], warnings: [...warnings, "no_complete_trip"] };
   }
 
   const candidates = dedupeSimilarPackages(raw);

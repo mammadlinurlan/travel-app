@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { Car } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, Car, Lightning } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DestinationSearch } from "@/components/travel/DestinationSearch";
@@ -27,6 +27,8 @@ interface TripSearchFormProps {
   initialNaturalLanguageText?: string;
   initialValues?: Partial<TripSearchFormValues>;
   initialDestinationLabel?: string;
+  onVoiceSubmit?: (audioBase64: string, mimeType: string) => void;
+  isTranscribingVoice?: boolean;
 }
 
 export function TripSearchForm({
@@ -38,6 +40,8 @@ export function TripSearchForm({
   initialNaturalLanguageText,
   initialValues,
   initialDestinationLabel,
+  onVoiceSubmit,
+  isTranscribingVoice,
 }: TripSearchFormProps) {
   const { t } = useLocale();
   const [destinationLabel] = useState(initialDestinationLabel ?? "");
@@ -68,13 +72,15 @@ export function TripSearchForm({
         event.stopPropagation();
         form.handleSubmit();
       }}
-      className="flex flex-col gap-3 rounded-2xl border border-border bg-white/95 p-4 text-left shadow-[0_24px_60px_-28px_rgba(16,34,53,0.5)] backdrop-blur sm:gap-4 sm:p-5"
+      className="flex flex-col gap-3 rounded-3xl border border-ivory/15 bg-ivory/[0.07] p-4 text-left shadow-[0_28px_70px_-30px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:gap-4 sm:p-5"
     >
       <NaturalLanguageInput
         onSubmit={onNaturalLanguageSubmit}
         isSubmitting={isParsingNaturalLanguage}
         error={naturalLanguageError}
         initialText={initialNaturalLanguageText}
+        onVoiceSubmit={onVoiceSubmit}
+        isTranscribingVoice={isTranscribingVoice}
       />
 
       <form.Field name="destination">
@@ -131,12 +137,12 @@ export function TripSearchForm({
         </form.Field>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 border-t border-border pt-3">
+      <div className="flex flex-wrap items-center gap-4 border-t border-ivory/10 pt-3">
         <form.Field name="transferRequired">
           {(field) => (
-            <label className="flex items-center gap-2 text-sm text-ink">
+            <label className="flex items-center gap-2 rounded-full border border-ivory/15 bg-ivory/[0.05] py-1.5 pl-2 pr-3 text-sm text-ivory/90">
               <Checkbox checked={field.state.value} onCheckedChange={(v) => field.handleChange(Boolean(v))} />
-              <Car className="size-4 text-navy" weight="regular" />
+              <Car className="size-4 text-gold" weight="regular" />
               {t.search.airportTransfer}
             </label>
           )}
@@ -154,10 +160,16 @@ export function TripSearchForm({
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="h-12 w-full rounded-xl bg-navy text-base font-semibold text-ivory hover:bg-navy-deep"
+        className="flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-gold text-base font-semibold text-navy-deep hover:bg-gold/90"
       >
+        <Lightning className="size-4" weight="fill" />
         {isSubmitting ? t.search.submitPending : t.search.submitIdle}
+        <ArrowRight className="size-4" weight="bold" />
       </Button>
+
+      <p className="flex items-center justify-center gap-1.5 text-center text-[11px] font-medium text-ivory/50">
+        {t.search.trustNote}
+      </p>
     </form>
   );
 }

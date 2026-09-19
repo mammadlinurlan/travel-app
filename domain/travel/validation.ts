@@ -61,6 +61,14 @@ export const nlpTripRequestSchema = z.object({
   text: z.string().min(3).max(1000),
 });
 
+/** Base64-encoded audio clip recorded in the browser (MediaRecorder), for voice search. */
+export const nlpVoiceTripRequestSchema = z.object({
+  audio: z.string().min(1),
+  mimeType: z.string().min(1).max(100),
+});
+
+export type NlpVoiceTripRequestInput = z.infer<typeof nlpVoiceTripRequestSchema>;
+
 /** Structured output the AI parser must conform to — validated before use. */
 export const parsedTripIntentSchema = z.object({
   destination: z.string().nullable(),

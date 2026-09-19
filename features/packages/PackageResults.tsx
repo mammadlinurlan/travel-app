@@ -1,13 +1,25 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { WarningCircle, X } from "@phosphor-icons/react/dist/ssr";
+import { WarningCircle } from "@phosphor-icons/react/dist/ssr";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { PackageCard } from "@/components/travel/PackageCard";
 import { PackageFilters, type SortMode } from "./PackageFilters";
-import { ResultsToolbar } from "./ResultsToolbar";
+import { ResultsToolbar, type ResultsViewMode } from "./ResultsToolbar";
+import { ResultsTopBar } from "./ResultsTopBar";
+import { FlightsList, HotelsList } from "./SourceGroupedResults";
+import { PackagesOfferView } from "./PackagesOfferView";
+import { formatDateRange } from "@/lib/utils/format";
 import { useLocale } from "@/lib/i18n/locale-context";
-import type { CabinClass, MealPlan, TravelPackage } from "@/domain/travel/types";
+import type {
+  CabinClass,
+  FlightOffer,
+  HotelOffer,
+  MealPlan,
+  Room,
+  TravelPackage,
+  TripSearchRequest,
+} from "@/domain/travel/types";
 
 /** Results shown per page; "Load more" reveals the next batch. */
 const PAGE_SIZE = 9;
@@ -18,24 +30,36 @@ interface PackageResultsProps {
   travelerCount: number;
   warnings: string[];
   onSelect: (pkg: TravelPackage) => void;
+  onSelectFlight: (flight: FlightOffer) => void;
+  onSelectHotel: (hotel: HotelOffer, room: Room) => void;
   onNewSearch: () => void;
   cabinClass: CabinClass;
   onCabinClassChange: (cabin: CabinClass) => void;
   isRefetching?: boolean;
+  onOpenBuilder: () => void;
+  request: TripSearchRequest;
 }
+
+type ResultsScreen = "grid" | "packages";
 
 export function PackageResults({
   packages,
   travelerCount,
   warnings,
   onSelect,
+  onSelectFlight,
+  onSelectHotel,
   onNewSearch,
   cabinClass,
   onCabinClassChange,
   isRefetching,
+  onOpenBuilder,
+  request,
 }: PackageResultsProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const [screen, setScreen] = useState<ResultsScreen>("grid");
   const [sortMode, setSortMode] = useState<SortMode>("recommended");
+  const [viewMode, setViewMode] = useState<ResultsViewMode>("flights");
   const [stars, setStars] = useState<number[]>(DEFAULT_STARS);
   const [minRating, setMinRating] = useState(0);
   const [directOnly, setDirectOnly] = useState(false);
@@ -155,6 +179,13 @@ export function PackageResults({
   const visible = filtered.slice(0, visibleCount);
   const hasMore = visibleCount < filtered.length;
 
+  // The header count/heading must reflect whichever tab is active — a
+  // bundled-package count is meaningless while browsing flights or hotels
+  // on their own, since many packages can share the same flight/hotel.
+  const flightCount = useMemo(() => new Set(filtered.map((pkg) => pkg.flight.id)).size, [filtered]);
+  const hotelCount = useMemo(() => new Set(filtered.map((pkg) => pkg.hotel.id)).size, [filtered]);
+  const activeResultCount = viewMode === "flights" ? flightCount : viewMode === "hotels" ? hotelCount : filtered.length;
+
   const filterPanel = (
     <PackageFilters
       stars={stars}
@@ -185,10 +216,39 @@ export function PackageResults({
     />
   );
 
+  const tripSummary = `${request.destination} · ${formatDateRange(
+    request.departureDate,
+    request.returnDate,
+    locale
+  )} · ${t.search.traveler(travelerCount)}`;
+
   return (
     <div className="flex flex-col">
+      <ResultsTopBar
+        tripSummary={tripSummary}
+        onBack={screen === "packages" ? () => setScreen("grid") : onNewSearch}
+        onOpenBuilder={onOpenBuilder}
+        onBuild={() => setScreen("packages")}
+        showBuildCta={screen === "grid"}
+      />
+      {/* Spacer for the fixed top bar above (h-16) — `fixed` is used instead of
+          `sticky` because this tree sits under Framer Motion's AnimatePresence,
+          where an animated ancestor's transform can silently break `position:
+          sticky`; `fixed` has no such dependency and is also trivially full-width. */}
+      <div className="h-14 sm:h-16" aria-hidden />
+
+      {screen === "packages" ? (
+        <PackagesOfferView
+          packages={packages}
+          travelerCount={travelerCount}
+          tripSummary={tripSummary}
+          onSelect={onSelect}
+          onBack={() => setScreen("grid")}
+        />
+      ) : (
+        <>
       <ResultsToolbar
-        resultCount={filtered.length}
+        resultCount={activeResultCount}
         sortMode={sortMode}
         onSortModeChange={setSortMode}
         onNewSearch={onNewSearch}
@@ -196,6 +256,8 @@ export function PackageResults({
         activeFilterCount={activeFilterCount}
         hotelQuery={hotelQuery}
         onHotelQueryChange={setHotelQuery}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       {warnings.length > 0 && (
@@ -203,7 +265,7 @@ export function PackageResults({
           {warnings.map((warning) => (
             <p key={warning} className="flex items-start gap-2 text-sm text-ink">
               <WarningCircle className="mt-0.5 size-4 shrink-0 text-gold-deep" weight="fill" aria-hidden />
-              {warning}
+              {t.warnings[warning as keyof typeof t.warnings] ?? warning}
             </p>
           ))}
         </div>
@@ -211,7 +273,7 @@ export function PackageResults({
 
       <div className="mt-8 flex gap-8">
         <aside className="hidden w-[248px] shrink-0 lg:block">
-          <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-border bg-white p-5 shadow-panel">
+          <div className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-2xl border border-border bg-white p-5 shadow-panel">
             {filterPanel}
           </div>
         </aside>
@@ -220,9 +282,13 @@ export function PackageResults({
           {packages.length === 0 ? (
             <EmptyState
               title={t.results.noTripTitle}
-              body={warnings[0] ?? t.results.tryAdjusting}
+              body={
+                warnings[0]
+                  ? (t.warnings[warnings[0] as keyof typeof t.warnings] ?? warnings[0])
+                  : t.results.tryAdjusting
+              }
             />
-          ) : visible.length === 0 ? (
+          ) : filtered.length === 0 ? (
             <EmptyState
               title={t.results.noMatchTitle}
               body={t.results.noMatchBody}
@@ -236,9 +302,13 @@ export function PackageResults({
                 </button>
               }
             />
+          ) : viewMode === "flights" ? (
+            <FlightsList packages={filtered} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
+          ) : viewMode === "hotels" ? (
+            <HotelsList packages={filtered} onSelectFlight={onSelectFlight} onSelectHotel={onSelectHotel} />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="card-stagger grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {visible.map((pkg, index) => (
                   <PackageCard
                     key={pkg.id}
@@ -265,22 +335,16 @@ export function PackageResults({
           )}
         </div>
       </div>
+        </>
+      )}
 
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent
           side="left"
           className="gap-0 overflow-y-auto p-0 data-[side=left]:w-full data-[side=left]:sm:max-w-sm"
         >
-          <SheetHeader className="flex-row items-center justify-between border-b border-border px-5 py-4">
+          <SheetHeader className="border-b border-border px-5 py-4">
             <SheetTitle className="text-base font-semibold text-ink">{t.results.filtersTitle}</SheetTitle>
-            <button
-              type="button"
-              onClick={() => setFiltersOpen(false)}
-              aria-label={t.results.closeFilters}
-              className="rounded-lg p-1 text-ink-muted transition-colors hover:bg-sand hover:text-ink"
-            >
-              <X className="size-5" weight="regular" aria-hidden />
-            </button>
           </SheetHeader>
 
           <div className="px-5 pb-28 pt-2">{filterPanel}</div>

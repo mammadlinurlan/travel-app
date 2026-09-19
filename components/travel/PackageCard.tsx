@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Airplane, ArrowRight, Check, Star } from "@phosphor-icons/react/dist/ssr";
+import { Airplane, ArrowRight, Car, Check, Star } from "@phosphor-icons/react/dist/ssr";
 import type { TravelPackage } from "@/domain/travel/types";
 import { RecommendationBadge } from "./RecommendationBadge";
-import { formatAmount, formatDuration, formatTime } from "@/lib/utils/format";
+import { formatAmount, formatDateShort, formatDuration, formatTime } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 import { useLocale, type Dictionary } from "@/lib/i18n/locale-context";
 
@@ -48,8 +48,19 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
       initial={reduceMotion ? false : { opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3), ease: [0.16, 1, 0.3, 1] }}
-      className="group flex h-full flex-col overflow-hidden rounded-[18px] border border-border bg-white shadow-card transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+      className={cn(
+        "group flex h-full flex-col overflow-hidden rounded-[18px] border bg-white shadow-card transition-[box-shadow,transform] duration-300 hover:-translate-y-1 hover:shadow-card-hover",
+        pkg.score.category === "best_value" ? "border-gold/60 anim-glow-gold" : "border-border"
+      )}
     >
+      {pkg.score.category === "best_value" && (
+        <div className="flex shrink-0 items-center justify-center border-b border-gold/25 bg-gold/15 py-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-deep">
+            {t.recommendationBadge.ribbon}
+          </span>
+        </div>
+      )}
+
       <div className="relative h-[132px] w-full shrink-0 overflow-hidden bg-sand">
         {pkg.hotel.image ? (
           <Image
@@ -98,21 +109,45 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
           </div>
         </header>
 
-        <div className="rounded-xl bg-sand/70 px-3.5 py-3">
-          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-muted">
-            <Airplane className="size-3.5" weight="regular" aria-hidden />
-            <span className="truncate">{firstLeg.airline}</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 rounded-xl bg-sand/70 px-3.5 py-3">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white">
+              <Airplane className="size-4 text-navy" weight="regular" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-ink-muted">
+                <span className="truncate">{firstLeg.airline}</span>
+              </div>
+              <p className="mt-0.5 text-[15px] font-semibold tracking-tight text-ink">
+                {firstLeg.origin.code} <span className="text-ink-muted">→</span> {lastLeg.destination.code}
+              </p>
+              <p className="mt-0.5 text-[13px] text-ink">
+                {formatDateShort(firstLeg.departureTime, locale)}, {formatTime(firstLeg.departureTime, locale)} —{" "}
+                {formatTime(lastLeg.arrivalTime, locale)}
+              </p>
+              <p className="mt-0.5 text-xs text-ink-muted">
+                {pkg.flight.stops === 0 ? t.packageCard.direct : t.packageCard.stops(pkg.flight.stops)} ·{" "}
+                {formatDuration(outboundMinutes)}
+              </p>
+            </div>
           </div>
-          <p className="mt-1.5 text-[15px] font-semibold tracking-tight text-ink">
-            {firstLeg.origin.code} <span className="text-ink-muted">→</span> {lastLeg.destination.code}
-          </p>
-          <p className="mt-0.5 text-[13px] text-ink">
-            {formatTime(firstLeg.departureTime, locale)} — {formatTime(lastLeg.arrivalTime, locale)}
-          </p>
-          <p className="mt-0.5 text-xs text-ink-muted">
-            {pkg.flight.stops === 0 ? t.packageCard.direct : t.packageCard.stops(pkg.flight.stops)} ·{" "}
-            {formatDuration(outboundMinutes)}
-          </p>
+
+          {pkg.transfer && (
+            <div className="flex items-center gap-3 rounded-xl bg-sand/70 px-3.5 py-3">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white">
+                <Car className="size-4 text-navy" weight="regular" aria-hidden />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-ink-muted">
+                  {t.packageDetails.transfer}
+                </p>
+                <p className="mt-0.5 truncate text-[13px] font-medium text-ink">{pkg.transfer.vehicle}</p>
+                <p className="mt-0.5 text-xs text-ink-muted">
+                  {pkg.transfer.type === "private" ? t.packageDetails.private : t.packageDetails.shared}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {visibleInclusions.length > 0 && (
@@ -129,32 +164,45 @@ export function PackageCard({ pkg, travelerCount, onView, index = 0 }: PackageCa
           </ul>
         )}
 
-        <div className="mt-auto flex items-end justify-between gap-3 border-t border-border pt-4">
-          <div className="flex flex-col">
-            <span className="text-[22px] font-semibold leading-none tracking-tight text-ink">
-              {formatAmount(pkg.price.total, pkg.price.currency)}
-            </span>
-            <span className="mt-1 text-[11px] text-ink-muted">
-              {formatAmount(perPerson, pkg.price.currency)} {t.packageCard.perPerson}
-            </span>
+        <div className="mt-auto flex flex-col gap-3 border-t border-border pt-4">
+          <div className="flex items-end justify-between gap-3">
+            <div className="flex flex-col">
+              <span className="text-[22px] font-semibold leading-none tracking-tight text-ink">
+                {formatAmount(pkg.price.total, pkg.price.currency)}
+              </span>
+              <span className="mt-1 text-[11px] text-ink-muted">
+                {formatAmount(perPerson, pkg.price.currency)} {t.packageCard.perPerson}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onView(pkg)}
+              aria-label={t.packageCard.viewTripAria(lastLeg.destination.city, pkg.hotel.name)}
+              className={cn(
+                "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2.5 text-sm font-medium",
+                "transition-colors duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2",
+                pkg.score.category === "best_value"
+                  ? "bg-gold text-navy-deep hover:bg-gold/90"
+                  : "bg-navy text-white hover:bg-navy-deep"
+              )}
+            >
+              {t.packageCard.viewTrip}
+              <ArrowRight
+                className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                weight="bold"
+                aria-hidden
+              />
+            </button>
           </div>
 
           <button
             type="button"
             onClick={() => onView(pkg)}
-            aria-label={t.packageCard.viewTripAria(lastLeg.destination.city, pkg.hotel.name)}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-navy px-3.5 py-2.5 text-sm font-medium text-white",
-              "transition-colors duration-200 hover:bg-navy-deep",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
-            )}
+            className="w-full rounded-lg border border-border py-2 text-xs font-medium text-ink-muted transition-colors hover:border-navy/30 hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40"
           >
-            {t.packageCard.viewTrip}
-            <ArrowRight
-              className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-              weight="bold"
-              aria-hidden
-            />
+            {t.packageCard.viewDetailsCta}
           </button>
         </div>
       </div>

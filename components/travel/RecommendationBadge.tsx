@@ -6,7 +6,7 @@ import { useLocale } from "@/lib/i18n/locale-context";
 
 const STYLE: Record<PackageCategory, { className: string; dot: string } | null> = {
   cheapest: { className: "bg-white/95 text-navy", dot: "bg-success" },
-  best_value: { className: "bg-white/95 text-navy", dot: "bg-gold-deep" },
+  best_value: { className: "bg-success/10 text-success", dot: "bg-success" },
   premium: { className: "bg-navy/90 text-white", dot: "bg-gold" },
   alternative: null,
 };

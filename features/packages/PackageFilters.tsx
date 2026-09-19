@@ -196,14 +196,17 @@ export function PackageFilters({
           ))}
         </fieldset>
 
-        <label className="mt-3 flex cursor-pointer items-center gap-2.5 text-sm text-ink">
-          <input
-            type="checkbox"
-            checked={directOnly}
-            onChange={(e) => onDirectOnlyChange(e.target.checked)}
-            className="size-4 rounded accent-navy"
-          />
-          {t.filters.directOnly}
+        <label className="mt-3 flex cursor-pointer items-center justify-between gap-2.5 text-sm text-ink">
+          <span>{t.filters.directOnly}</span>
+          <span className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-border transition-colors has-checked:bg-navy">
+            <input
+              type="checkbox"
+              checked={directOnly}
+              onChange={(e) => onDirectOnlyChange(e.target.checked)}
+              className="peer sr-only"
+            />
+            <span className="pointer-events-none absolute left-0.5 size-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
+          </span>
         </label>
 
         {airlines.length > 1 && (
@@ -299,7 +302,7 @@ function Section({
 }) {
   return (
     <section className={cn("border-t border-border py-4", last && "pb-0")}>
-      <h3 className="mb-2.5 text-[13px] font-semibold text-ink">{label}</h3>
+      <h3 className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-muted">{label}</h3>
       {children}
     </section>
   );

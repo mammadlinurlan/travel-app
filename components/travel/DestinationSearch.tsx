@@ -60,10 +60,10 @@ export function DestinationSearch({ value, label: externalLabel, onChange, error
 
   return (
     <div className="relative flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-navy">{t.search.destinationLabel}</label>
+      <label className="text-sm font-medium text-ivory/90">{t.search.destinationLabel}</label>
 
       <div className="relative">
-        <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-muted" weight="regular" />
+        <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gold" weight="regular" />
         <input
           value={open ? query : label || value || query}
           onChange={(e) => {
@@ -74,7 +74,7 @@ export function DestinationSearch({ value, label: externalLabel, onChange, error
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 100)}
           placeholder={t.search.destinationPlaceholder}
-          className="h-12 w-full rounded-lg border border-border bg-white pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted focus:border-navy focus:outline-none"
+          className="h-12 w-full rounded-lg border border-ivory/15 bg-ivory/[0.05] pl-9 pr-3 text-sm text-ivory placeholder:text-ivory/30 focus:border-gold focus:outline-none"
         />
       </div>
 

@@ -78,3 +78,17 @@ export async function parseTripIntent(text: string): Promise<ParsedTripIntent> {
   });
   return handle<ParsedTripIntent>(response);
 }
+
+export interface VoiceTripParsePayload {
+  audio: string; // base64-encoded recording
+  mimeType: string;
+}
+
+export async function parseTripIntentFromVoice(payload: VoiceTripParsePayload): Promise<ParsedTripIntent> {
+  const response = await fetch("/api/ai/parse-trip-voice", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return handle<ParsedTripIntent>(response);
+}

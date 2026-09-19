@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/lib/i18n/locale-context";
+import { IxLogo } from "@/components/layout/IxLogo";
 
 interface SiteHeaderProps {
   /** "transparent" floats the header over the hero image; "solid" is the in-app bar. */
@@ -30,21 +30,16 @@ export function SiteHeader({ variant = "solid", onHome }: SiteHeaderProps) {
           : "sticky top-0 border-b border-border bg-white/85 backdrop-blur-md"
       )}
     >
-      <div className="mx-auto flex h-16 w-full max-w-[1400px] items-center gap-8 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 w-full max-w-[1400px] items-center gap-8 px-4 sm:px-6 lg:px-8">
         <button
           type="button"
           onClick={onHome}
           className="group flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy/40 focus-visible:ring-offset-2"
           aria-label={t.brand.homeAria}
         >
-          <span
-            className={cn(
-              "flex items-center rounded-[10px] px-2.5 py-1.5 transition-colors",
-              transparent ? "" : "bg-navy"
-            )}
-          >
-            <Image src="/ixtour-logo.png" alt={t.brand.name} width={112} height={37} className="h-7 w-auto" priority />
-          </span>
+          <div className={cn(!transparent && "rounded-lg bg-navy px-2.5 py-1.5")}>
+            <IxLogo height={52} />
+          </div>
         </button>
 
         <nav aria-label="Main" className="hidden flex-1 items-center gap-1 md:flex">

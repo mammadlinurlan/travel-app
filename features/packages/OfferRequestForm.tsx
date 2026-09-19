@@ -56,7 +56,9 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
       <form.Field name="customerName" validators={{ onChange: nameSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-navy">{t.offerForm.fullName}</label>
+            <label className="text-sm font-medium text-navy">
+              {t.offerForm.fullName} <span className="text-error">*</span>
+            </label>
             <input
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
@@ -72,7 +74,9 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
       <form.Field name="customerEmail" validators={{ onChange: emailSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-navy">{t.offerForm.email}</label>
+            <label className="text-sm font-medium text-navy">
+              {t.offerForm.email} <span className="text-error">*</span>
+            </label>
             <input
               type="email"
               value={field.state.value}
@@ -115,7 +119,7 @@ export function OfferRequestForm({ packageId, onDone }: OfferRequestFormProps) {
 
       {mutation.isError && <p className="text-sm text-error">{(mutation.error as Error).message}</p>}
 
-      <Button type="submit" disabled={mutation.isPending} className="mt-1 bg-navy text-ivory hover:bg-navy-deep">
+      <Button type="submit" disabled={mutation.isPending} className="mt-1 h-12 bg-navy text-ivory hover:bg-navy-deep">
         {mutation.isPending ? t.offerForm.sendPending : t.offerForm.sendCta}
       </Button>
     </form>

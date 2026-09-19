@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Figma export, not part of the Next.js app (pre-existing, untracked).
+    "figma-maked/**",
   ]),
 ]);
 

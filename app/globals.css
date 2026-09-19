@@ -83,15 +83,15 @@
 }
 
 :root {
-  /* Brand palette — exact values from the design spec */
-  --navy: #193250; /* primary */
-  --navy-deep: #102235; /* main text / deepest surface */
-  --ivory: #f7f8f5; /* page background */
-  --sand: #eef0eb; /* secondary surface, hover fills */
-  --gold: #fee286; /* accent — fills only, never text */
-  --gold-deep: #e0a93b; /* accent for glyphs on light surfaces (stars, sparkles) */
-  --ink: #102235;
-  --ink-muted: #718096;
+  /* Brand palette — matches figma-maked/Premium Travel Platform Design/src/index.css */
+  --navy: #1e2d3d; /* primary */
+  --navy-deep: #141f2b; /* main text / deepest surface */
+  --ivory: #f7f6f2; /* page background */
+  --sand: #edeae3; /* secondary surface, hover fills */
+  --gold: #b5673d; /* accent — warm terracotta/copper, used for CTAs, active states, drag-over */
+  --gold-deep: #9a5530; /* accent for glyphs on light surfaces (stars, sparkles) — darker than --gold for contrast on light bg */
+  --ink: #17202a;
+  --ink-muted: #6b7a8d;
   --success: #2f7d5c;
   --error: #b54747;
 
@@ -110,8 +110,8 @@
   --accent: var(--sand);
   --accent-foreground: var(--navy);
   --destructive: var(--error);
-  --border: #e5e7eb;
-  --input: #e5e7eb;
+  --border: #ddd9d2;
+  --input: #ddd9d2;
   --ring: color-mix(in oklab, var(--navy) 45%, transparent);
   --chart-1: var(--navy);
   --chart-2: var(--gold-deep);
@@ -173,4 +173,132 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ── Motion system — ported from the Figma Make visual mockup ──
+   Prefer Framer Motion for entrance/exit transitions in components that
+   already use it; these CSS keyframes cover cases FM doesn't naturally do
+   (looping ambient effects, the mic visualizer, staggered card grids). */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-14px); }
+}
+@keyframes glow-gold {
+  0%, 100% { box-shadow: 0 0 20px 0 rgba(181,103,61,0.18), 0 20px 60px -10px rgba(181,103,61,0.12); }
+  50%       { box-shadow: 0 0 40px 4px rgba(181,103,61,0.36), 0 20px 60px -10px rgba(181,103,61,0.22); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -20px) scale(1.06); }
+  66%       { transform: translate(-20px, 15px) scale(0.96); }
+}
+@keyframes counter-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+@keyframes listening-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 20px; }
+}
+@keyframes source-slide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: var(--target-width); }
+}
+
+.listening-bar {
+  animation: listening-bar 0.6s ease-in-out infinite;
+}
+.listening-bar:nth-child(2) { animation-delay: 0.1s; }
+.listening-bar:nth-child(3) { animation-delay: 0.2s; }
+.listening-bar:nth-child(4) { animation-delay: 0.1s; }
+.listening-bar:nth-child(5) { animation-delay: 0s; }
+
+.source-card {
+  animation: source-slide 0.4s ease forwards;
+}
+
+/* Entrance helpers */
+.anim-fade-up    { animation: fade-up    0.55s cubic-bezier(.22,.68,0,1.2) both; }
+.anim-fade-in    { animation: fade-in    0.5s ease both; }
+.anim-slide-down { animation: slide-down 0.45s cubic-bezier(.22,.68,0,1.2) both; }
+.anim-scale-in   { animation: scale-in   0.5s cubic-bezier(.22,.68,0,1.2) both; }
+.anim-float      { animation: float-y    4s ease-in-out infinite; }
+.anim-glow-gold  { animation: glow-gold  3s ease-in-out infinite; }
+.anim-orbit      { animation: orbit 2.4s linear infinite; }
+.anim-counter    { animation: counter-orbit 1.8s linear infinite; }
+.anim-orb        { animation: orb-drift 12s ease-in-out infinite; }
+.anim-pulse-ring { animation: pulse-ring 2s ease-in-out infinite; }
+
+/* Result cards stagger */
+.card-stagger > * { animation: source-slide 0.4s ease both; }
+.card-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.card-stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.card-stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.card-stagger > *:nth-child(4) { animation-delay: 0.26s; }
+.card-stagger > *:nth-child(5) { animation-delay: 0.33s; }
+.card-stagger > *:nth-child(6) { animation-delay: 0.40s; }
+.card-stagger > *:nth-child(7) { animation-delay: 0.47s; }
+.card-stagger > *:nth-child(8) { animation-delay: 0.54s; }
+
+.drag-over {
+  border-color: var(--gold) !important;
+  background-color: rgba(181, 103, 61, 0.05) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-up, .anim-fade-in, .anim-slide-down, .anim-scale-in,
+  .anim-float, .anim-glow-gold, .anim-orbit, .anim-counter, .anim-orb,
+  .anim-pulse-ring, .listening-bar, .source-card, .card-stagger > * {
+    animation: none !important;
+  }
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  cursor: pointer;
 }

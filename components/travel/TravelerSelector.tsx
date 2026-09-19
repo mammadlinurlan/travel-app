@@ -29,19 +29,19 @@ export function TravelerSelector({ value, onChange }: TravelerSelectorProps) {
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-navy">{t.search.travelersLabel}</label>
+      <label className="text-sm font-medium text-ivory/90">{t.search.travelersLabel}</label>
       <Popover>
         <PopoverTrigger
           render={
             <Button
               variant="outline"
               type="button"
-              className="h-12 w-full justify-start gap-2 border-border bg-white font-normal text-ink hover:bg-sand/60"
+              className="h-12 w-full justify-start gap-2 overflow-hidden border-ivory/15 bg-ivory/[0.05] font-normal text-ivory hover:bg-ivory/10"
             />
           }
         >
-          <Users className="size-4 text-navy" weight="regular" />
-          <span>{t.search.traveler(total)}</span>
+          <Users className="size-4 shrink-0 text-gold" weight="regular" />
+          <span className="min-w-0 flex-1 truncate text-left">{t.search.traveler(total)}</span>
         </PopoverTrigger>
         <PopoverContent className="w-72 p-4" align="start">
           <div className="flex flex-col gap-3">
